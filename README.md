@@ -24,44 +24,52 @@ NOTE: If you are not using npm/es6 you can add the library via script tag and us
 #### 2) In the background page -> Init the background hub.
 This is obligatory for the library to work and should be done as early as possible in your background page.
 ```javascript
+function connectedHandler = function(extPart, name, tabId) {
+    console.log('someone connected:', arguments);
+}
+
+function disconnectedHandler = function(extPart, name, tabId) {
+    console.log('someone disconnected:', arguments);
+}
+
 messenger.initBackgroundHub({
-    connectedHandler: function(extPart, name, tabId) { console.log('someone connected:', arguments); }, 
-    disconnectedHandler: function(extPart, name, tabId) { console.log('someone disconnected:', arguments); }
+    connectedHandler: connectedHandler,
+    disconnectedHandler: disconnectedHandler
 });
 ```
 
 #### 3) Init connections using "initConnection(name, messageHandler)".
 ```javascript
 var messageHandler = function(message, from, sender, sendResponse) {
-    if (message.name === 'how are you?') {
-        sendResponse('A-OK');
+    if (message.name === 'HI!') {
+        sendResponse('HOWDY!');
     }
 };
 
-var connection = messenger.initConnection('main', messageHandler);
+var c = messenger.initConnection('main', messageHandler);
 ```
 
 #### 4) Start sending messages between connections using "sendMessage(to, message, responseCallback)"
 ```javascript
 // Parameters:
-// to - formatted string indicating where to send the message to: 'part:name'.
-        for messages from background to other parts, tabId is also required like so: 'part:name:tabId'.
-        extension part values: 'background', 'content_script', 'popup', 'devtool'.
+// to - string indicating where to send the message to: 'part:name'.
+//      part values: 'background', 'content_script', 'popup', 'devtool'.
+//      tab id is required for messages from background to other parts: 'part:name:tabId'.
 // message - the message to send.
-// responseCallback - function that will be called with the response value of the reciever.
+// responseCallback - function that will be called if receiver invoked "sendResponse".
 
 // devtool -> content script
-connection.sendMessage('content_script:main', { name: 'how are you?' }, function(response) {
+c.sendMessage('content_script:main', { msg: 'HI!' }, function(response) {
    console.log(response);
 });
 
 // popup -> background
-connection.sendMessage('background:some connection name', { name: 'how are you?' }, function(response) {
+c.sendMessage('background:some connection name', { msg: 'HI!' }, function(response) {
    console.log(response);
 });
 
 // background -> content script ("150" is a tab id example).
-connection.sendMessage('content_script:main:150', { name: 'how are you?' }, function(response) {
+c.sendMessage('content_script:main:150', { msg: 'HI!' }, function(response) {
    console.log(response);
 });
 
@@ -70,12 +78,13 @@ connection.sendMessage('content_script:main:150', { name: 'how are you?' }, func
 
 #### More:
 ```javascript
-// Sending a message to multiple connections is supported using 'part:name1,name2,...'.
-connection.sendMessage('content_script:main,main2', { name: 'how are you?' });
+// Sending to multiple connections is supported using 'part:name1,name2,...'.
+c.sendMessage('content_script:main,main2', { msg: 'HI!' });
 
-// Sending a message to all connections is supported using wildcard value '*'.
-connection.sendMessage('devtool:*', { name: 'how are you?' });
+// Sending to all connections is supported using wildcard value '*'.
+c.sendMessage('devtool:*', { msg: 'HI!' });
 ```
+
 ### Developing Locally
 ```javascript
 // install webpack
