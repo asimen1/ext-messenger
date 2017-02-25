@@ -41,7 +41,7 @@ messenger.initBackgroundHub({
 #### 3) Init connections using "initConnection(name, messageHandler)".
 ```javascript
 var messageHandler = function(message, from, sender, sendResponse) {
-    if (message.name === 'HI!') {
+    if (message.text === 'HI!') {
         sendResponse('HOWDY!');
     }
 };
@@ -59,17 +59,17 @@ var c = messenger.initConnection('main', messageHandler);
 // responseCallback - function that will be called if receiver invoked "sendResponse".
 
 // devtool -> content script
-c.sendMessage('content_script:main', { msg: 'HI!' }, function(response) {
+c.sendMessage('content_script:main', { text: 'HI!' }, function(response) {
    console.log(response);
 });
 
 // popup -> background
-c.sendMessage('background:some connection name', { msg: 'HI!' }, function(response) {
+c.sendMessage('background:main', { text: 'HI!' }, function(response) {
    console.log(response);
 });
 
 // background -> content script ("150" is a tab id example).
-c.sendMessage('content_script:main:150', { msg: 'HI!' }, function(response) {
+c.sendMessage('content_script:main:150', { text: 'HI!' }, function(response) {
    console.log(response);
 });
 
@@ -79,10 +79,10 @@ c.sendMessage('content_script:main:150', { msg: 'HI!' }, function(response) {
 #### More:
 ```javascript
 // Sending to multiple connections is supported using 'part:name1,name2,...'.
-c.sendMessage('content_script:main,main2', { msg: 'HI!' });
+c.sendMessage('content_script:main,main2', { text: 'HI!' });
 
 // Sending to all connections is supported using wildcard value '*'.
-c.sendMessage('devtool:*', { msg: 'HI!' });
+c.sendMessage('devtool:*', { text: 'HI!' });
 ```
 
 ### Developing Locally
