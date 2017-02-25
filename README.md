@@ -14,71 +14,76 @@ Furthermore the chrome messaging API is not coherent or straight forward, someti
 ### Usage
 
 #### 1) In any extension part -> Create a messenger instance.
-
-    var Messenger = require('chrome-ext-messenger');
-    var messenger = new Messenger();
+```javascript
+var Messenger = require('chrome-ext-messenger');
+var messenger = new Messenger();
+```
 
 NOTE: If you are not using npm/es6 you can add the library via script tag and use _window['chrome-ext-messenger']_.
 
 #### 2) In the background page -> Init the background hub.
 This is obligatory for the library to work and should be done as early as possible in your background page.
-
-    messenger.initBackgroundHub({
-        connectedHandler: function(extPart, name, tabId) { console.log('someone connected:', arguments); }, 
-        disconnectedHandler: function(extPart, name, tabId) { console.log('someone disconnected:', arguments); }
-    });
+```javascript
+messenger.initBackgroundHub({
+    connectedHandler: function(extPart, name, tabId) { console.log('someone connected:', arguments); }, 
+    disconnectedHandler: function(extPart, name, tabId) { console.log('someone disconnected:', arguments); }
+});
+```
 
 #### 3) Init connections using "initConnection(name, messageHandler)".
+```javascript
+var messageHandler = function(message, from, sender, sendResponse) {
+    if (message.name === 'how are you?') {
+        sendResponse('A-OK');
+    }
+};
 
-    var messageHandler = function(message, from, sender, sendResponse) {
-        if (message.name === 'how are you?') {
-            sendResponse('A-OK');
-        }
-    };
-
-    var connection = messenger.initConnection('main', messageHandler);
+var connection = messenger.initConnection('main', messageHandler);
+```
 
 #### 4) Start sending messages between connections using "sendMessage(to, message, responseCallback)"
-    // Parameters:
-    // to - formatted string indicating where to send the message to: 'part:name'.
-            for messages from background to other parts, tabId is also required like so: 'part:name:tabId'.
-            extension part values: 'background', 'content_script', 'popup', 'devtool'.
-    // message - the message to send.
-    // responseCallback - function that will be called with the response value of the reciever.
+```javascript
+// Parameters:
+// to - formatted string indicating where to send the message to: 'part:name'.
+        for messages from background to other parts, tabId is also required like so: 'part:name:tabId'.
+        extension part values: 'background', 'content_script', 'popup', 'devtool'.
+// message - the message to send.
+// responseCallback - function that will be called with the response value of the reciever.
 
-    // devtool -> content script
-    connection.sendMessage('content_script:main', { name: 'how are you?' }, function(response) {
-       console.log(response);
-    });
+// devtool -> content script
+connection.sendMessage('content_script:main', { name: 'how are you?' }, function(response) {
+   console.log(response);
+});
 
-    // popup -> background
-    connection.sendMessage('background:some connection name', { name: 'how are you?' }, function(response) {
-       console.log(response);
-    });
+// popup -> background
+connection.sendMessage('background:some connection name', { name: 'how are you?' }, function(response) {
+   console.log(response);
+});
 
-    // background -> content script ("150" is a tab id example).
-    connection.sendMessage('content_script:main:150', { name: 'how are you?' }, function(response) {
-       console.log(response);
-    });
+// background -> content script ("150" is a tab id example).
+connection.sendMessage('content_script:main:150', { name: 'how are you?' }, function(response) {
+   console.log(response);
+});
 
-    // ...
+// ...
+```
 
 #### More:
+```javascript
+// Sending a message to multiple connections is supported using 'part:name1,name2,...'.
+connection.sendMessage('content_script:main,main2', { name: 'how are you?' });
 
-    // Sending a message to multiple connections is supported using 'part:name1,name2,...'.
-    connection.sendMessage('content_script:main,main2', { name: 'how are you?' });
-
-    // Sending a message to all connections is supported using wildcard value '*'.
-    connection.sendMessage('devtool:*', { name: 'how are you?' });
-
+// Sending a message to all connections is supported using wildcard value '*'.
+connection.sendMessage('devtool:*', { name: 'how are you?' });
+```
 ### Developing Locally
+```javascript
+// install webpack
+npm install webpack -g
 
-    // install webpack
-    npm install webpack -g
-
-    // run the dev script
-    npm run dev
-
+// run the dev script
+npm run dev
+```
 You can now use the built messenger from the _dist_ folder in a local test extension (or use [npm link](https://docs.npmjs.com/cli/link)).
 I have created one (for internal testing purposes) that you can use: [chrome-ext-messenger-test](https://github.com/asimen1/chrome-ext-messenger-test).
 
