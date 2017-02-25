@@ -49,7 +49,7 @@ var messageHandler = function(message, from, sender, sendResponse) {
 var c = messenger.initConnection('main', messageHandler);
 ```
 
-#### 4) Start sending messages between connections using "sendMessage(to, message, responseCallback)"
+#### 4) Start sending messages between connections using "sendMessage(to, message, responseCallback)".
 ```javascript
 // Parameters:
 // to - string indicating where to send the message to: 'part:name'.
