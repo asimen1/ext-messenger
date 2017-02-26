@@ -13,17 +13,11 @@ Furthermore the chrome messaging API is not coherent or straight forward, someti
 
 ### Usage
 
-#### 1) In any extension part -> Create a messenger instance.
+#### 1) In the background page: Create a messenger instance and init the background hub.
 ```javascript
 var Messenger = require('chrome-ext-messenger');
 var messenger = new Messenger();
-```
 
-NOTE: If you are not using npm/es6 you can add the library via script tag and use _window['chrome-ext-messenger']_.
-
-#### 2) In the background page -> Init the background hub.
-This is obligatory for the library to work and should be done as early as possible in your background page.
-```javascript
 function connectedHandler = function(extPart, name, tabId) {
     console.log('someone connected:', arguments);
 }
@@ -38,8 +32,15 @@ messenger.initBackgroundHub({
 });
 ```
 
-#### 3) Init connections using "initConnection(name, messageHandler)".
+This is obligatory for the library to work and should be done as early as possible in your background page.
+
+If you are not using npm/es6, add the library via script tag and use _window['chrome-ext-messenger']_.
+
+#### 2) "initConnection(name, messageHandler)" - Init connections (in any extension parts).
 ```javascript
+var Messenger = require('chrome-ext-messenger');
+var messenger = new Messenger();
+
 var messageHandler = function(message, from, sender, sendResponse) {
     if (message.text === 'HI!') {
         sendResponse('HOWDY!');
@@ -47,28 +48,29 @@ var messageHandler = function(message, from, sender, sendResponse) {
 };
 
 var c = messenger.initConnection('main', messageHandler);
+var c2 = messenger.initConnection('main2', messageHandler);
 ```
 
-#### 4) Start sending messages between connections using "sendMessage(to, message, responseCallback)".
+#### 3) "sendMessage(to, message, responseCallback)" - Start sending messages across connections (in any extension parts).
 ```javascript
 // Parameters:
-// to - string indicating where to send the message to: 'part:name'.
-//      part values: 'background', 'content_script', 'popup', 'devtool'.
-//      tab id is required for messages from background to other parts: 'part:name:tabId'.
+// to - where to send the message to: '<part>:<name>'.
+//      <part> values: 'background', 'content_script', 'popup', 'devtool'.
 // message - the message to send.
 // responseCallback - function that will be called if receiver invoked "sendResponse".
 
-// devtool -> content script
+// devtool.js -> content script
 c.sendMessage('content_script:main', { text: 'HI!' }, function(response) {
    console.log(response);
 });
 
-// popup -> background
+// popup.js -> background
 c.sendMessage('background:main', { text: 'HI!' }, function(response) {
    console.log(response);
 });
 
-// background -> content script ("150" is a tab id example).
+// Messages from background to other parts require tab id: '<part>:<name>:<tabId>'.
+// background.js -> content script ("150" is a tab id example).
 c.sendMessage('content_script:main:150', { text: 'HI!' }, function(response) {
    console.log(response);
 });
@@ -100,7 +102,7 @@ I have created one (for internal testing purposes) that you can use: [chrome-ext
 * Requires your extension to have ["tabs" permission](https://developer.chrome.com/extensions/declare_permissions).
 * Uses only long lived port connections via chrome.runtime.* API.
 * This library should satisfy all your message passing demands, however if you are still handling some port connections manually using _chrome.runtime.onConnect_, you will also receive messenger ports connections. In order to identify connections originating from this library you can use the static method *Messenger.isMessengerPort(port)* which will return true/false.
-* The Messenger messageHandler and chrome.runtime.onMessage similarities and differences:
+* The Messenger messageHandler and _chrome.runtime.onMessage_ similarities and differences:
 
     Same:
     * "sender" object.
@@ -115,7 +117,6 @@ I have created one (for internal testing purposes) that you can use: [chrome-ext
 ### Todos
 * Support cross tabs communication (e.g. content script from tab 1 to content script of tab 2).
 * connection.sendMessage: support array (multiples) in "toExtPart".
-* connection.sendMessage: support array (multiples) in "toTabIds" for background to non background.
 * connection.sendMessage: support * in "toTabIds" for background to non background (don't forget the "fromTabId" assignment...).
 
 License
