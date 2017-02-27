@@ -37,7 +37,7 @@ messenger.initBackgroundHub({
 
 This is obligatory for the library to work and should be done as early as possible in your background page.
 
-If you are not using npm/es6, add the library via script tag and use _window['chrome-ext-messenger']_.
+If you are not using npm/es6, add the [library](https://github.com/asimen1/chrome-ext-messenger/tree/master/dist) via script tag and use _window['chrome-ext-messenger']_.
 
 #### 2) "initConnection(name, messageHandler)" - Init connections (in any extension parts).
 ```javascript
