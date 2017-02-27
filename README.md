@@ -49,6 +49,8 @@ var messageHandler = function(message, from, sender, sendResponse) {
 
 var c = messenger.initConnection('main', messageHandler);
 var c2 = messenger.initConnection('main2', messageHandler);
+
+...
 ```
 
 #### 3) "sendMessage(to, message, responseCallback)" - Start sending messages across connections (in any extension parts).
@@ -57,7 +59,7 @@ var c2 = messenger.initConnection('main2', messageHandler);
 // to - where to send the message to: '<part>:<name>'.
 //      <part> values: 'background', 'content_script', 'popup', 'devtool'.
 // message - the message to send.
-// responseCallback - function that will be called if receiver invoked "sendResponse".
+// responseCallback - function that will be called if the receiver message handler invoked "sendResponse".
 
 // devtool.js -> content script
 c.sendMessage('content_script:main', { text: 'HI!' }, function(response) {
@@ -75,7 +77,7 @@ c.sendMessage('content_script:main:150', { text: 'HI!' }, function(response) {
    console.log(response);
 });
 
-// ...
+...
 ```
 
 #### More:
@@ -85,6 +87,9 @@ c.sendMessage('content_script:main,main2', { text: 'HI!' });
 
 // Sending to all connections is supported using wildcard value '*'.
 c.sendMessage('devtool:*', { text: 'HI!' });
+
+// Disconnect the connection to stop listening for messages.
+c.disconnect()
 ```
 
 ### Developing Locally
@@ -100,19 +105,14 @@ I have created one (for internal testing purposes) that you can use: [chrome-ext
 
 ### Notes
 * Requires your extension to have ["tabs" permission](https://developer.chrome.com/extensions/declare_permissions).
-* Uses only long lived port connections via chrome.runtime.* API.
-* This library should satisfy all your message passing demands, however if you are still handling some port connections manually using _chrome.runtime.onConnect_, you will also receive messenger ports connections. In order to identify connections originating from this library you can use the static method *Messenger.isMessengerPort(port)* which will return true/false.
+* Uses only long lived port connections via _chrome.runtime.*_ API.
+* This library should satisfy all your message passing demands, however if you are still handling some port connections manually using _chrome.runtime.onConnect_, you will also receive messenger ports connections. In order to identify connections originating from this library you can use the static method **Messenger.isMessengerPort(port)** which will return true/false.
 * The Messenger messageHandler and _chrome.runtime.onMessage_ similarities and differences:
-
-    Same:
-    * "sender" object.
-    * "sendResponse" - The argument should be any JSON-ifiable object.
-    * "sendResponse" - With multiple message handler, the sendResponse() will work only for the first one to respond.
-    
-    
-    Different:
-    * "from" object indicating the senders formatted identifier e.g. 'devtool:some connection name'.
-    * Async sendResponse is supported directly (no need to return "true" value like _chrome.runtime.onMessage_ usage).
+    * **Same** - "sender" object.
+    * **Same** - "sendResponse" - The argument should be any JSON-ifiable object.
+    * **Same** - "sendResponse" - With multiple message handler, the sendResponse() will work only for the first one to respond.  
+    * **Different** - "from" object indicating the senders formatted identifier e.g. 'devtool:connection name'.
+    * **Different** - Async sendResponse is supported directly (no need to return "true" value like with _chrome.runtime.onMessage_).
 
 ### Todos
 * Support cross tabs communication (e.g. content script from tab 1 to content script of tab 2).
