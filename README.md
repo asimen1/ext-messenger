@@ -12,6 +12,9 @@ Adding callback functionality to these messages can make it even trickier.
 Furthermore the chrome messaging API is not coherent or straight forward, sometimes requiring you to use _chrome.runtime.\*_ and sometimes _chrome.tabs.\*_ depending on which extension part you are currently in.
 
 ### Usage
+```javascript
+npm install chrome-ext-messenger --save
+```
 
 #### 1) In the background page: Create a messenger instance and init the background hub.
 ```javascript
@@ -94,7 +97,8 @@ c.disconnect()
 
 ### Developing Locally
 ```javascript
-// install webpack
+// install dependencies
+npm install
 npm install webpack -g
 
 // run the dev script
@@ -118,6 +122,9 @@ I have created one (for internal testing purposes) that you can use: [chrome-ext
 * Support cross tabs communication (e.g. content script from tab 1 to content script of tab 2).
 * connection.sendMessage: support array (multiples) in "toExtPart".
 * connection.sendMessage: support * in "toTabIds" for background to non background (don't forget the "fromTabId" assignment...).
+
+### Extensions using messenger
+[Restyler](https://chrome.google.com/webstore/detail/restyler/ofkkcnbmhaodoaehikkibjanliaeffel)
 
 License
 ----
