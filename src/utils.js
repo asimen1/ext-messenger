@@ -69,7 +69,7 @@ const Utils = {
     getCurrentExtensionPart: function() {
         let retVal;
 
-        if (chrome) {
+        if (typeof(chrome) !== 'undefined') {
             // chrome.extension.getBackgroundPage() is available in background & popup.
             if (chrome.extension && typeof chrome.extension.getBackgroundPage === 'function') {
                 let backgroundPage = chrome.extension.getBackgroundPage();
@@ -79,7 +79,7 @@ const Utils = {
                 retVal = chrome.devtools ? Constants.DEVTOOL : Constants.CONTENT_SCRIPT;
             }
         } else {
-            loggerError.error('Could not identify extension context part...');
+            loggerError.error('Could not identify extension part... are you running in a chrome extension context?');
         }
 
         loggerLog.log('detected current extension part: ' + retVal);
