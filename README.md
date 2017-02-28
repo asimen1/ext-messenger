@@ -1,6 +1,8 @@
 ## Chrome extension message passing made easy
 
-This is a small library for sending messages across any extension parts (background, content script, popup or devtool).
+### What?
+
+Small library for sending messages across any extension parts (background, content script, popup or devtool).
 
 It has a simple easy to use API, callback support and more.
 
@@ -11,7 +13,7 @@ Adding callback functionality to these messages can make it even trickier.
 
 Furthermore the chrome messaging API is not coherent or straight forward, sometimes requiring you to use _chrome.runtime.\*_ and sometimes _chrome.tabs.\*_ depending on which extension part you are currently in.
 
-### Usage
+### How?
 ```javascript
 npm install chrome-ext-messenger --save
 ```
