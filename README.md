@@ -23,11 +23,11 @@ npm install chrome-ext-messenger --save
 var Messenger = require('chrome-ext-messenger');
 var messenger = new Messenger();
 
-function connectedHandler = function(extPart, name, tabId) {
+function connectedHandler(extPart, name, tabId) {
     console.log('someone connected:', arguments);
 }
 
-function disconnectedHandler = function(extPart, name, tabId) {
+function disconnectedHandler(extPart, name, tabId) {
     console.log('someone disconnected:', arguments);
 }
 
