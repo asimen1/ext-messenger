@@ -7,10 +7,8 @@
   ],
   "license": "MIT",
   "keywords": [
-    "chrome",
-    "extension",
-    "message",
-    "passing",
+    "chrome extension",
+    "message passing",
     "messenger",
     "messages"
   ],
