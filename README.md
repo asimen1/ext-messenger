@@ -46,9 +46,7 @@ If you are not using npm/es6, add the [library](https://github.com/asimen1/chrom
 // "name" - identifier name for this connection, can be any string except "*" (wildcard).
 // "messageHandler" - handler for incoming messages to this connection.
 messenger.initConnection(name, messageHandler)
-```
-For example:
-```javascript
+
 var Messenger = require('chrome-ext-messenger');
 var messenger = new Messenger();
 
@@ -71,9 +69,7 @@ var c2 = messenger.initConnection('main2', messageHandler);
 // "message" - the message to send.
 // "responseCallback" - function that will be called if the receiver message handler invoked "sendResponse".
 connection.sendMessage(to, message, responseCallback)
-```
-For example:
-```javascript
+
 // devtool.js -> content script
 c.sendMessage('content_script:main', { text: 'HI!' }, function(response) {
    console.log(response);
