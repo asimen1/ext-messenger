@@ -43,24 +43,24 @@ If you are not using npm/es6, add the [library](https://github.com/asimen1/chrom
 
 #### 2) Init connections (in any extension parts).
 ```javascript
-// "name" - identifier name for this connection, can be any string except "*" (wildcard).
-// "messageHandler" - handler for incoming messages to this connection.
 messenger.initConnection(name, messageHandler)
 ```
+* "name" - identifier name for this connection, can be any string except "*" (wildcard).
+* "messageHandler" - handler for incoming messages to this connection.
 
 #### 3) Start sending messages across connections (in any extension parts).
 ```javascript
-// "to" - where to send the message to: '<extension part>:<connection name>'.
-//        * <extension part> can be: 'background', 'content_script', 'popup', 'devtool'.
-//        * messages from background require an additional tab id argument ':<tabId>'.
-// "message" - the message to send (any JSON-ifiable object).
-// "responseCallback" - function that will be called if the receiver message handler invoked "sendResponse".
 connection.sendMessage(to, message, responseCallback)
 ```
+* "to" - where to send the message to: '\<extension part>:\<connection name>'.
+  * \<extension part> can be: 'background', 'content_script', 'popup', 'devtool'.
+  * messages from background require an additional tab id argument ':<tabId>'.
+* "message" - the message to send (any JSON-ifiable object).
+* "responseCallback" - function that will be called if the receiver message handler invoked "sendResponse".
 
 #### More:
 ```javascript
-// Sending to multiple connections is supported using 'part:name1,name2,...'.
+// Sending to multiple connections is supported via 'part:name1,name2,...'.
 c.sendMessage('content_script:main,main2', { text: 'HI!' });
 
 // Sending to all connections is supported using wildcard value '*'.
@@ -72,9 +72,9 @@ c.disconnect()
 
 ### For Example:
 ```javascript
-/* --------------------------------------------------------------------------------------- */
-/* Init connections in desired extension part (BACKGROUND, CONTENT_SCRIPT, POPUP, DEVTOOL) */
-/* --------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------- */
+/* In desired extension part (BACKGROUND, CONTENT_SCRIPT, POPUP, DEVTOOL) */
+/* ---------------------------------------------------------------------- */
 var Messenger = require('chrome-ext-messenger');
 var messenger = new Messenger();
 
