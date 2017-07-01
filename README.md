@@ -58,6 +58,18 @@ messenger.initConnection(name, messageHandler)
 connection.sendMessage(to, message, responseCallback)
 ```
 
+#### More:
+```javascript
+// Sending to multiple connections is supported using 'part:name1,name2,...'.
+c.sendMessage('content_script:main,main2', { text: 'HI!' });
+
+// Sending to all connections is supported using wildcard value '*'.
+c.sendMessage('devtool:*', { text: 'HI!' });
+
+// Disconnect the connection to stop listening for messages.
+c.disconnect()
+```
+
 ### For Example:
 ```javascript
 /* --------------------------------------------------------------------------------------- */
@@ -102,18 +114,6 @@ c.sendMessage('background:main', { text: 'HI!' }, function(response) {
 c.sendMessage('devtool:main:150', { text: 'HI!' }, function(response) {
    console.log(response);
 });
-```
-
-#### More:
-```javascript
-// Sending to multiple connections is supported using 'part:name1,name2,...'.
-c.sendMessage('content_script:main,main2', { text: 'HI!' });
-
-// Sending to all connections is supported using wildcard value '*'.
-c.sendMessage('devtool:*', { text: 'HI!' });
-
-// Disconnect the connection to stop listening for messages.
-c.disconnect()
 ```
 
 ### Developing Locally
