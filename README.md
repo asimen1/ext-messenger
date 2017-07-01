@@ -18,7 +18,7 @@ Furthermore the chrome messaging API is not coherent or straight forward, someti
 npm install chrome-ext-messenger
 ```
 
-#### 1) In the background page: Create a messenger instance and init the background hub.
+#### 1) In the background page: create a messenger instance and init the background hub.
 ```javascript
 var Messenger = require('chrome-ext-messenger');
 var messenger = new Messenger();
