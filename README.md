@@ -82,6 +82,13 @@ c.sendMessage('content_script:main', { text: 'HI!' }, function(response) {
    console.log(response);
 });
 
+/* -------------- */
+/* CONTENT SCRIPT */
+/* -------------- */
+c.sendMessage('popup:main2', { text: 'HI!' }, function(response) {
+   console.log(response);
+});
+
 /* ----- */
 /* POPUP */
 /* ----- */
@@ -92,7 +99,7 @@ c.sendMessage('background:main', { text: 'HI!' }, function(response) {
 /* ---------- */
 /* BACKGROUND */
 /* ---------- */
-c.sendMessage('content_script:main:150', { text: 'HI!' }, function(response) {
+c.sendMessage('devtool:main:150', { text: 'HI!' }, function(response) {
    console.log(response);
 });
 ```
