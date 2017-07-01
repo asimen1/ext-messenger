@@ -54,7 +54,7 @@ connection.sendMessage(to, message, responseCallback)
 ```
 * "to" - where to send the message to: '\<extension part>:\<connection name>'.
   * \<extension part> can be: 'background', 'content_script', 'popup', 'devtool'.
-  * messages from background require an additional tab id argument ':<tabId>'.
+  * messages from background require an additional tab id argument ':\<tabId>'.
 * "message" - the message to send (any JSON-ifiable object).
 * "responseCallback" - function that will be called if the receiver message handler invoked "sendResponse".
 
