@@ -15,7 +15,7 @@ Furthermore the chrome messaging API is not coherent or straight forward, someti
 
 ### How?
 ```javascript
-npm install chrome-ext-messenger --save
+npm install chrome-ext-messenger
 ```
 
 #### 1) In the background page: Create a messenger instance and init the background hub.
@@ -41,7 +41,13 @@ This is obligatory for the library to work and should be done as early as possib
 
 If you are not using npm/es6, add the [library](https://github.com/asimen1/chrome-ext-messenger/tree/master/dist) via script tag and use _window['chrome-ext-messenger']_.
 
-#### 2) "initConnection(name, messageHandler)" - Init connections (in any extension parts).
+#### 2) Init connections (in any extension parts).
+```javascript
+// "name" - identifier name for this connection, can be any string except "*" (wildcard).
+// "messageHandler" - handler for incoming messages to this connection.
+messenger.initConnection(name, messageHandler)
+```
+For example:
 ```javascript
 var Messenger = require('chrome-ext-messenger');
 var messenger = new Messenger();
@@ -58,14 +64,16 @@ var c2 = messenger.initConnection('main2', messageHandler);
 ...
 ```
 
-#### 3) "sendMessage(to, message, responseCallback)" - Start sending messages across connections (in any extension parts).
+#### 3) Start sending messages across connections (in any extension parts).
 ```javascript
-// Parameters:
-// to - where to send the message to: '<part>:<name>'.
-//      <part> values: 'background', 'content_script', 'popup', 'devtool'.
-// message - the message to send.
-// responseCallback - function that will be called if the receiver message handler invoked "sendResponse".
-
+// "to" - where to send the message to: '<extension part>:<connection name>'.
+//        <extension part> can be: 'background', 'content_script', 'popup', 'devtool'.
+// "message" - the message to send.
+// "responseCallback" - function that will be called if the receiver message handler invoked "sendResponse".
+connection.sendMessage(to, message, responseCallback)
+```
+For example:
+```javascript
 // devtool.js -> content script
 c.sendMessage('content_script:main', { text: 'HI!' }, function(response) {
    console.log(response);
