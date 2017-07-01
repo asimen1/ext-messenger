@@ -1,6 +1,6 @@
 {
   "name": "chrome-ext-messenger",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "author": "Asaf Menahem",
   "description": "Chrome extension message passing made easy",
   "main": "dist/chrome-ext-messenger.min.js",
@@ -12,7 +12,12 @@
   "repository": "https://github.com/asimen1/chrome-ext-messenger",
   "bugs": "https://github.com/asimen1/chrome-ext-messenger/issues",
   "license": "MIT",
-  "keywords": ["chrome extension", "message passing", "messenger", "messages"],
+  "keywords": [
+    "chrome extension",
+    "message passing",
+    "messenger",
+    "messages"
+  ],
   "devDependencies": {
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
