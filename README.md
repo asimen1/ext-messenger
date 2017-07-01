@@ -46,7 +46,23 @@ If you are not using npm/es6, add the [library](https://github.com/asimen1/chrom
 // "name" - identifier name for this connection, can be any string except "*" (wildcard).
 // "messageHandler" - handler for incoming messages to this connection.
 messenger.initConnection(name, messageHandler)
+```
 
+#### 3) Start sending messages across connections (in any extension parts).
+```javascript
+// "to" - where to send the message to: '<extension part>:<connection name>'.
+//        * <extension part> can be: 'background', 'content_script', 'popup', 'devtool'.
+//        * messages from background require an additional tab id argument ':<tabId>'.
+// "message" - the message to send (any JSON-ifiable object).
+// "responseCallback" - function that will be called if the receiver message handler invoked "sendResponse".
+connection.sendMessage(to, message, responseCallback)
+```
+
+### For Example:
+```javascript
+/* ---------------------------------------------------------------------------------- */
+/* Init connection in any extension part (BACKGROUND, CONTENT_SCRIPT, POPUP, DEVTOOL) */
+/* ---------------------------------------------------------------------------------- */
 var Messenger = require('chrome-ext-messenger');
 var messenger = new Messenger();
 
@@ -59,34 +75,26 @@ var messageHandler = function(message, from, sender, sendResponse) {
 var c = messenger.initConnection('main', messageHandler);
 var c2 = messenger.initConnection('main2', messageHandler);
 
-...
-```
-
-#### 3) Start sending messages across connections (in any extension parts).
-```javascript
-// "to" - where to send the message to: '<extension part>:<connection name>'.
-//        <extension part> can be: 'background', 'content_script', 'popup', 'devtool'.
-// "message" - the message to send.
-// "responseCallback" - function that will be called if the receiver message handler invoked "sendResponse".
-connection.sendMessage(to, message, responseCallback)
-
-// devtool.js -> content script
+/* ------- */
+/* DEVTOOL */
+/* ------- */
 c.sendMessage('content_script:main', { text: 'HI!' }, function(response) {
    console.log(response);
 });
 
-// popup.js -> background
+/* ----- */
+/* POPUP */
+/* ----- */
 c.sendMessage('background:main', { text: 'HI!' }, function(response) {
    console.log(response);
 });
 
-// Messages from background to other parts require tab id: '<part>:<name>:<tabId>'.
-// background.js -> content script ("150" is a tab id example).
+/* ---------- */
+/* BACKGROUND */
+/* ---------- */
 c.sendMessage('content_script:main:150', { text: 'HI!' }, function(response) {
    console.log(response);
 });
-
-...
 ```
 
 #### More:
@@ -127,7 +135,7 @@ I have created one (for internal testing purposes) that you can use: [chrome-ext
 ### Todos
 * Support cross tabs communication (e.g. content script from tab 1 to content script of tab 2).
 * connection.sendMessage: support array (multiples) in "toExtPart".
-* connection.sendMessage: support * in "toTabIds" for background to non background (don't forget the "fromTabId" assignment...).
+* connection.sendMessage: support "*" in "toTabIds" for background to non background (check "fromTabId" assignment...).
 
 ### Extensions using messenger
 [Restyler](https://chrome.google.com/webstore/detail/restyler/ofkkcnbmhaodoaehikkibjanliaeffel)
