@@ -60,9 +60,9 @@ connection.sendMessage(to, message, responseCallback)
 
 ### For Example:
 ```javascript
-/* ---------------------------------------------------------------------------------- */
-/* Init connection in any extension part (BACKGROUND, CONTENT_SCRIPT, POPUP, DEVTOOL) */
-/* ---------------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------------------- */
+/* Init connections in desired extension part (BACKGROUND, CONTENT_SCRIPT, POPUP, DEVTOOL) */
+/* --------------------------------------------------------------------------------------- */
 var Messenger = require('chrome-ext-messenger');
 var messenger = new Messenger();
 
