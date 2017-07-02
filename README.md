@@ -48,6 +48,8 @@ messenger.initConnection(name, messageHandler)
 * "name" - identifier name for this connection, can be any string except "*" (wildcard).
 * "messageHandler" - handler for incoming messages to this connection.
 
+This returns a _connection_ object.
+
 #### 3) Start sending messages across connections (in any extension parts).
 ```javascript
 connection.sendMessage(to, message, responseCallback)
