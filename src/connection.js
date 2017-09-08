@@ -114,12 +114,12 @@ Connection.prototype._attemptDeadCbCleanup = function() {
     }
 };
 
-Connection.prototype._prepareMessage = function(message, cb) {
+Connection.prototype._prepareMessage = function(message, cbPromiseResolve) {
     return new Promise((resolve) => {
         // Handle callback if given.
-        if (cb) {
+        if (cbPromiseResolve) {
             this._cbId++;
-            this._pendingCb[this._cbId] = cb;
+            this._pendingCb[this._cbId] = cbPromiseResolve;
             message.cbId = this._cbId;
 
             this._attemptDeadCbCleanup();
@@ -152,8 +152,8 @@ Connection.prototype._prepareMessage = function(message, cb) {
 };
 
 // Generic post message with callback support.
-Connection.prototype._postMessage = function(port, message, cb) {
-    this._prepareMessage(message, cb).then(() => {
+Connection.prototype._postMessage = function(port, message, cbPromiseResolve) {
+    this._prepareMessage(message, cbPromiseResolve).then(() => {
         if (this._inited) {
             port.postMessage(message);
         } else {
@@ -204,17 +204,17 @@ Connection.prototype._handleMessage = function(message, fromPort) {
 
 Connection.prototype._handleResponse = function(response) {
     if (this._pendingCb[response.cbId]) {
-        let cb = this._pendingCb[response.cbId];
+        let cbPromiseResolve = this._pendingCb[response.cbId];
         delete this._pendingCb[response.cbId];
 
-        // Invoke the callback.
-        cb(response.cbValue);
+        // Resolve the promise with the response callback value.
+        cbPromiseResolve(response.cbValue);
     } else {
         Utils.log('info', '[Connection:_handleResponse]', 'ignoring response sending because callback does not exist (probably already been called)');
     }
 };
 
-Connection.prototype._sendMessage = function(port, toExtPart, toNames, toTabId, userMessage, cb) {
+Connection.prototype._sendMessage = function(port, toExtPart, toNames, toTabId, userMessage, cbPromiseResolve) {
     // Add our port name prefix to the user given name (if given and not wildcard).
     toNames = this._addMessengerPortNamePrefix(toNames);
 
@@ -228,7 +228,7 @@ Connection.prototype._sendMessage = function(port, toExtPart, toNames, toTabId, 
         userMessage: userMessage
     };
 
-    this._postMessage(port, message, cb);
+    this._postMessage(port, message, cbPromiseResolve);
 };
 
 Connection.prototype._addMessengerPortNamePrefix = function(toNames) {
@@ -306,33 +306,36 @@ Connection.prototype._onPortMessageHandler = function(message, fromPort) {
 // Exposed API - start.
 // ------------------------------------------------------------
 
-Connection.prototype.sendMessage = function(to, message, cb) {
-    if (!to) { Utils.log('error', '[Connection:sendMessage]', 'missing "to" arguments'); }
+Connection.prototype.sendMessage = function(to, message) {
+    // Always returns a promise (callback support).
+    return new Promise((cbPromiseResolve) => {
+        if (!to) { Utils.log('error', '[Connection:sendMessage]', 'missing "to" arguments'); }
 
-    if (this._port) {
-        // Parse 'to' to args... for example => 'devtool:main:1225'
-        let toArgs;
-        try {
-            toArgs = to.split(':');
-        } catch (e) {
-            Utils.log('error', '[Connection:sendMessage]', 'Invalid format given in "to" argument: ' + to, arguments);
+        if (this._port) {
+            // Parse 'to' to args... for example => 'devtool:main:1225'
+            let toArgs;
+            try {
+                toArgs = to.split(':');
+            } catch (e) {
+                Utils.log('error', '[Connection:sendMessage]', 'Invalid format given in "to" argument: ' + to, arguments);
+            }
+
+            let toExtPart = toArgs[0];
+            let toName = toArgs[1];
+            let toTabId = toArgs[2];
+
+            // Validate (will throw error if something is invalid).
+            let errorMsg = this._validateMessage(toExtPart, toName, toTabId);
+            if (errorMsg) { Utils.log('error', '[Connection:sendMessage]', errorMsg, arguments); }
+
+            // Normalize to array to support multiple names.
+            let toNames = toName.split(',');
+
+            this._sendMessage(this._port, toExtPart, toNames, toTabId, message, cbPromiseResolve);
+        } else {
+            Utils.log('warn', '[Connection:sendMessage]', 'ignoring sending message because connection does not exist anymore, did you disconnected it?');
         }
-
-        let toExtPart = toArgs[0];
-        let toName = toArgs[1];
-        let toTabId = toArgs[2];
-
-        // Validate (will throw error if something is invalid).
-        let errorMsg = this._validateMessage(toExtPart, toName, toTabId);
-        if (errorMsg) { Utils.log('error', '[Connection:sendMessage]', errorMsg, arguments); }
-
-        // Normalize to array to support multiple names.
-        let toNames = toName.split(',');
-
-        this._sendMessage(this._port, toExtPart, toNames, toTabId, message, cb);
-    } else {
-        Utils.log('warn', '[Connection:sendMessage]', 'ignoring sending message because connection does not exist anymore, did you disconnected it?');
-    }
+    });
 };
 
 Connection.prototype.disconnect = function() {

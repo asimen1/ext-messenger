@@ -1,5 +1,6 @@
 /* eslint-env node, node */
 
+const path = require('path');
 const webpack = require('webpack');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
@@ -15,10 +16,10 @@ if (env === 'build') {
 var config = {
     devtool: 'source-map',
 
-    entry: __dirname + '/src/messenger.js',
+    entry: path.join(__dirname, 'src', 'messenger.js'),
 
     output: {
-        path: __dirname + '/dist',
+        path: path.join(__dirname, 'dist'),
         filename: 'chrome-ext-messenger.min.js',
         library: 'chrome-ext-messenger',
         libraryTarget: 'umd',

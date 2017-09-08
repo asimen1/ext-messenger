@@ -4,11 +4,11 @@
 
 Small library for sending messages across any extension parts (background, content script, popup or devtool).
 
-It has a simple easy to use API, callback support and more.
+It has a simple easy to use API, promise based callback support and more.
 
 ### Why?
 
-If you ever tried (like me) creating a fairly large extension which required communication between different parts, you might noticed that sending messages between the parts can get complicated and usually requires some relaying mechanism in the background page.
+If you ever tried (like me) creating a fairly large extension which required communication between different parts, you might noticed that sending messages between the parts can get complicated and usually requires some relaying mechanism in the background page.  
 Adding callback functionality to these messages can make it even trickier.
 
 Furthermore the chrome messaging API is not coherent or straight forward, sometimes requiring you to use _chrome.runtime.\*_ and sometimes _chrome.tabs.\*_ depending on which extension part you are currently in.
@@ -52,13 +52,16 @@ This returns a _connection_ object.
 
 #### 3) Start sending messages across connections (in any extension parts).
 ```javascript
-connection.sendMessage(to, message, responseCallback)
+connection.sendMessage(to, message).then(function(response) {
+    console.log('got response!', response);
+});
 ```
 * "to" - where to send the message to: '\<extension part>:\<connection name>'.
   * \<extension part> can be: 'background', 'content_script', 'popup', 'devtool'.
   * messages from background require an additional tab id argument ':\<tabId>'.
 * "message" - the message to send (any JSON-ifiable object).
-* "responseCallback" - function that will be called if the receiver message handler invoked "sendResponse".
+
+This methods returns a **promise** that will be resolved if the receiver message handler invoked _"sendResponse"_.
 
 #### More:
 ```javascript
@@ -92,29 +95,29 @@ var c2 = messenger.initConnection('main2', messageHandler);
 /* ------- */
 /* DEVTOOL */
 /* ------- */
-c.sendMessage('content_script:main', { text: 'HI!' }, function(response) {
-   console.log(response);
+c.sendMessage('content_script:main', { text: 'HI!' }).then(function(response) {
+    console.log(response);
 });
 
 /* -------------- */
 /* CONTENT SCRIPT */
 /* -------------- */
-c.sendMessage('popup:main2', { text: 'HI!' }, function(response) {
-   console.log(response);
+c.sendMessage('popup:main2', { text: 'HI!' }).then(function(response) {
+    console.log(response);
 });
 
 /* ----- */
 /* POPUP */
 /* ----- */
-c.sendMessage('background:main', { text: 'HI!' }, function(response) {
-   console.log(response);
+c.sendMessage('background:main', { text: 'HI!' }).then(function(response) {
+    console.log(response);
 });
 
 /* ---------- */
 /* BACKGROUND */
 /* ---------- */
-c.sendMessage('devtool:main:150', { text: 'HI!' }, function(response) {
-   console.log(response);
+c.sendMessage('devtool:main:150', { text: 'HI!' }).then(function(response) {
+    console.log(response);
 });
 ```
 
