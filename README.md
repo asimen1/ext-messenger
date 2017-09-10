@@ -8,14 +8,14 @@ It has a simple easy to use API, promise based callback support and more.
 
 ### Why?
 
-If you ever tried (like me) creating a fairly large extension which required communication between different parts, you might noticed that sending messages between the parts can get complicated and usually requires some relaying mechanism in the background page.  
+Sending messages between the parts can get complicated and usually requires some relaying mechanism in the background page.  
 Adding callback functionality to these messages can make it even trickier.
 
 Furthermore the chrome messaging API is not coherent or straight forward, sometimes requiring you to use _chrome.runtime.\*_ and sometimes _chrome.tabs.\*_ depending on which extension part you are currently in.
 
 ### How?
 ```javascript
-npm install chrome-ext-messenger
+npm i chrome-ext-messenger
 ```
 
 #### 1) In the background page: create a messenger instance and init the background hub.
@@ -24,11 +24,11 @@ var Messenger = require('chrome-ext-messenger');
 var messenger = new Messenger();
 
 function connectedHandler(extPart, name, tabId) {
-    console.log('someone connected:', arguments);
+    console.log('someone connected!');
 }
 
 function disconnectedHandler(extPart, name, tabId) {
-    console.log('someone disconnected:', arguments);
+    console.log('someone disconnected!');
 }
 
 messenger.initBackgroundHub({
@@ -39,7 +39,7 @@ messenger.initBackgroundHub({
 
 This is obligatory for the library to work and should be done as early as possible in your background page.
 
-If you are not using npm/es6, add the [library](https://github.com/asimen1/chrome-ext-messenger/tree/master/dist) via script tag and use _window['chrome-ext-messenger']_.
+If you're not using npm/modules, add the [library](https://github.com/asimen1/chrome-ext-messenger/tree/master/dist) via script tag and use _window['chrome-ext-messenger']_.
 
 #### 2) Init connections (in any extension parts).
 ```javascript
@@ -123,13 +123,9 @@ c.sendMessage('devtool:main:150', { text: 'HI!' }).then(function(response) {
 
 ### Developing Locally
 ```javascript
-// install dependencies
-npm install
-npm install webpack -g
-
-// run the dev script
 npm run dev
 ```
+
 You can now use the built messenger from the _dist_ folder in a local test extension (or use [npm link](https://docs.npmjs.com/cli/link)).
 I have created one (for internal testing purposes) that you can use: [chrome-ext-messenger-test](https://github.com/asimen1/chrome-ext-messenger-test).
 
