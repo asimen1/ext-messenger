@@ -8,8 +8,7 @@ It has a simple easy to use API, promise based callback support and more.
 
 ### Why?
 
-Sending messages between the parts can get complicated and usually requires some relaying mechanism in the background page.  
-Adding callback functionality to these messages can make it even trickier.
+Sending messages between the parts can get complicated and usually requires some relaying mechanism in the background page. Adding callback functionality to these messages can make it even trickier.
 
 Furthermore the chrome messaging API is not coherent or straight forward, sometimes requiring you to use _chrome.runtime.\*_ and sometimes _chrome.tabs.\*_ depending on which extension part you are currently in.
 
