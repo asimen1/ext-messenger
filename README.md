@@ -2,13 +2,13 @@
 
 ### What?
 
-Small library for sending messages across any extension parts (background, content script, popup or devtool).
+Small library for messaging across any extension parts (background, content script, popup or devtool).
 
 It has a simple easy to use API, promise based callback support and more.
 
 ### Why?
 
-Sending messages between the parts can get complicated and usually requires some relaying mechanism in the background page. Adding callback functionality to these messages can make it even trickier.
+Sending messages between extension parts can get complicated and usually requires some relaying mechanism in the background page. Adding callback functionality to these messages can make it even trickier.
 
 Furthermore the chrome messaging API is not coherent or straight forward, sometimes requiring you to use _chrome.runtime.\*_ and sometimes _chrome.tabs.\*_ depending on which extension part you are currently in.
 
@@ -31,14 +31,15 @@ function disconnectedHandler(extPart, name, tabId) {
 }
 
 messenger.initBackgroundHub({
-    connectedHandler: connectedHandler,
-    disconnectedHandler: disconnectedHandler
+    connectedHandler: connectedHandler, // (optional)
+    disconnectedHandler: disconnectedHandler // (optional)
 });
 ```
 
-This is obligatory for the library to work and should be done as early as possible in your background page.
+This step is **obligatory** and should be done as early as possible in your background page.
 
-If you're not using npm/modules, add the [library](https://github.com/asimen1/chrome-ext-messenger/tree/master/dist) via script tag and use _window['chrome-ext-messenger']_.
+\* If you're not working with npm or module packing, add the [library](https://github.com/asimen1/chrome-ext-messenger/tree/master/dist) via script tag and use
+_window['chrome-ext-messenger']_.
 
 #### 2) Init connections (in any extension parts).
 ```javascript
@@ -47,7 +48,7 @@ messenger.initConnection(name, messageHandler)
 * "name" - identifier name for this connection, can be any string except "*" (wildcard).
 * "messageHandler" - handler for incoming messages to this connection.
 
-This returns a _connection_ object.
+This returns a **connection** object.
 
 #### 3) Start sending messages across connections (in any extension parts).
 ```javascript
@@ -60,7 +61,7 @@ connection.sendMessage(to, message).then(function(response) {
   * messages from background require an additional tab id argument ':\<tabId>'.
 * "message" - the message to send (any JSON-ifiable object).
 
-This methods returns a **promise** that will be resolved if the receiver message handler invoked _"sendResponse"_.
+This returns a **promise** that will be resolved if the receiver message handler invoked _"sendResponse"_.
 
 #### More:
 ```javascript
@@ -125,7 +126,7 @@ c.sendMessage('devtool:main:150', { text: 'HI!' }).then(function(response) {
 npm run dev
 ```
 
-You can now use the built messenger from the _dist_ folder in a local test extension (or use [npm link](https://docs.npmjs.com/cli/link)).
+You can now use the built messenger from the _dist_ folder in a local test extension (or use [npm link](https://docs.npmjs.com/cli/link)).  
 I have created one (for internal testing purposes) that you can use: [chrome-ext-messenger-test](https://github.com/asimen1/chrome-ext-messenger-test).
 
 ### Notes
