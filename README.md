@@ -86,8 +86,8 @@ c.disconnect()
 const Messenger = require('chrome-ext-messenger');
 let messenger = new Messenger();
 
-let messageHandler = function(message, from, sender, sendResponse) {
-    if (message.text === 'HI!') {
+let messageHandler = function(msg, from, sender, sendResponse) {
+    if (msg.text === 'HI!') {
         sendResponse('HOWDY!');
     }
 };
@@ -96,22 +96,24 @@ let c = messenger.initConnection('main', messageHandler);
 let c2 = messenger.initConnection('main2', messageHandler);
 ...
 
+let msg = { text: 'HI!' };
+
 /* ------------------------------------------------------ */
 /* DEVTOOL - Send message to content script               */
 /* ------------------------------------------------------ */
-c.sendMessage('content_script:main', { text: 'HI!' });
+c.sendMessage('content_script:main', msg);
 
 /* ------------------------------------------------------ */
 /* CONTENT SCRIPT - Send message to popup (with response) */
 /* ------------------------------------------------------ */
-c.sendMessage('popup:main2', { text: 'HI!' }).then((response) => {
+c.sendMessage('popup:main2', msg).then((response) => {
     console.log(response);
 });
 
 /* ------------------------------------------------------ */
 /* POPUP - Send message to background (with response)     */
 /* ------------------------------------------------------ */
-c.sendMessage('background:main', { text: 'HI!' }).then((response) => {
+c.sendMessage('background:main', msg).then((response) => {
     console.log(response);
 });
 
@@ -119,7 +121,7 @@ c.sendMessage('background:main', { text: 'HI!' }).then((response) => {
 /* BACKGROUND - Send message to devtool (with response)   */
 /* '50' is an example tab id of the devtool.              */
 /* ------------------------------------------------------ */
-c.sendMessage('devtool:main:50', { text: 'HI!' }).then((response) => {
+c.sendMessage('devtool:main:50', msg).then((response) => {
     console.log(response);
 });
 ```
