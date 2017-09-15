@@ -19,21 +19,10 @@ npm i chrome-ext-messenger
 
 #### 1) In the background page: create a messenger instance and init the background hub.
 ```javascript
-var Messenger = require('chrome-ext-messenger');
-var messenger = new Messenger();
+const Messenger = require('chrome-ext-messenger');
+let messenger = new Messenger();
 
-function connectedHandler(extPart, name, tabId) {
-    console.log('someone connected!');
-}
-
-function disconnectedHandler(extPart, name, tabId) {
-    console.log('someone disconnected!');
-}
-
-messenger.initBackgroundHub({
-    connectedHandler: connectedHandler, // (optional)
-    disconnectedHandler: disconnectedHandler // (optional)
-});
+messenger.initBackgroundHub();
 ```
 
 This step is **obligatory** and should be done as early as possible in your background page.
@@ -43,29 +32,42 @@ _window['chrome-ext-messenger']_.
 
 #### 2) Init connections (in any extension parts).
 ```javascript
+const Messenger = require('chrome-ext-messenger');
+let messenger = new Messenger();
+
+/*
+ * {string} name - Identifier name for this connection.
+ * {function} messageHandler - Handler for incoming messages.
+ */
 messenger.initConnection(name, messageHandler)
 ```
-* "name" - identifier name for this connection, can be any string except "*" (wildcard).
-* "messageHandler" - handler for incoming messages to this connection.
 
 This returns a **connection** object.
 
 #### 3) Start sending messages across connections (in any extension parts).
 ```javascript
-connection.sendMessage(to, message).then(function(response) {
-    console.log('got response!', response);
-});
+/*
+ * {string} to - '<extension part>:<connection name>'.
+ * {*} message - The message to send (any JSON-ifiable object).
+ */
+connection.sendMessage(to, message);
 ```
-* "to" - where to send the message to: '\<extension part>:\<connection name>'.
-  * \<extension part> can be: 'background', 'content_script', 'popup', 'devtool'.
-  * messages from background require an additional tab id argument ':\<tabId>'.
-* "message" - the message to send (any JSON-ifiable object).
+
+* \<extension part> possible values: 'background', 'content_script', 'popup', 'devtool'.
+* Sending messages from background require an additional tab id argument ':\<tab id>'.
 
 This returns a **promise** that will be resolved if the receiver message handler invoked _"sendResponse"_.
 
 #### More:
 ```javascript
-// Sending to multiple connections is supported via 'part:name1,name2,...'.
+// Init hub with handlers notifying someone connected/disconnected.
+messenger.initBackgroundHub({
+    connectedHandler: (extensionPart, connectionName, tabId) => {},
+    disconnectedHandler: (extensionPart, connectionName, tabId) => {}
+});
+
+// Sending to multiple connections is supported via:
+// 'extension part:name1,name2,...'.
 c.sendMessage('content_script:main,main2', { text: 'HI!' });
 
 // Sending to all connections is supported using wildcard value '*'.
@@ -77,46 +79,47 @@ c.disconnect()
 
 ### For Example:
 ```javascript
-/* ---------------------------------------------------------------------- */
-/* In desired extension part (BACKGROUND, CONTENT_SCRIPT, POPUP, DEVTOOL) */
-/* ---------------------------------------------------------------------- */
-var Messenger = require('chrome-ext-messenger');
-var messenger = new Messenger();
+/* ---------------------------------------------- */
+/* Init connections in desired extension part     */
+/* (BACKGROUND, CONTENT_SCRIPT, POPUP, DEVTOOL)   */
+/* ---------------------------------------------- */
+const Messenger = require('chrome-ext-messenger');
+let messenger = new Messenger();
 
-var messageHandler = function(message, from, sender, sendResponse) {
+let messageHandler = function(message, from, sender, sendResponse) {
     if (message.text === 'HI!') {
         sendResponse('HOWDY!');
     }
 };
 
-var c = messenger.initConnection('main', messageHandler);
-var c2 = messenger.initConnection('main2', messageHandler);
+let c = messenger.initConnection('main', messageHandler);
+let c2 = messenger.initConnection('main2', messageHandler);
+...
 
-/* ------- */
-/* DEVTOOL */
-/* ------- */
-c.sendMessage('content_script:main', { text: 'HI!' }).then(function(response) {
+/* ------------------------------------------------------ */
+/* DEVTOOL - Send message to content script               */
+/* ------------------------------------------------------ */
+c.sendMessage('content_script:main', { text: 'HI!' });
+
+/* ------------------------------------------------------ */
+/* CONTENT SCRIPT - Send message to popup (with response) */
+/* ------------------------------------------------------ */
+c.sendMessage('popup:main2', { text: 'HI!' }).then((response) => {
     console.log(response);
 });
 
-/* -------------- */
-/* CONTENT SCRIPT */
-/* -------------- */
-c.sendMessage('popup:main2', { text: 'HI!' }).then(function(response) {
+/* ------------------------------------------------------ */
+/* POPUP - Send message to background (with response)     */
+/* ------------------------------------------------------ */
+c.sendMessage('background:main', { text: 'HI!' }).then((response) => {
     console.log(response);
 });
 
-/* ----- */
-/* POPUP */
-/* ----- */
-c.sendMessage('background:main', { text: 'HI!' }).then(function(response) {
-    console.log(response);
-});
-
-/* ---------- */
-/* BACKGROUND */
-/* ---------- */
-c.sendMessage('devtool:main:150', { text: 'HI!' }).then(function(response) {
+/* ------------------------------------------------------ */
+/* BACKGROUND - Send message to devtool (with response)   */
+/* '50' is an example tab id of the devtool.              */
+/* ------------------------------------------------------ */
+c.sendMessage('devtool:main:50', { text: 'HI!' }).then((response) => {
     console.log(response);
 });
 ```
@@ -139,11 +142,6 @@ I have created one (for internal testing purposes) that you can use: [chrome-ext
     * **Same** - "sendResponse" - With multiple message handler, the sendResponse() will work only for the first one to respond.  
     * **Different** - "from" object indicating the senders formatted identifier e.g. 'devtool:connection name'.
     * **Different** - Async sendResponse is supported directly (no need to return "true" value like with _chrome.runtime.onMessage_).
-
-### Todos
-* Support cross tabs communication (e.g. content script from tab 1 to content script of tab 2).
-* connection.sendMessage: support array (multiples) in "toExtPart".
-* connection.sendMessage: support "*" in "toTabIds" for background to non background (check "fromTabId" assignment...).
 
 ### Extensions using messenger
 [Restyler](https://chrome.google.com/webstore/detail/restyler/ofkkcnbmhaodoaehikkibjanliaeffel)
