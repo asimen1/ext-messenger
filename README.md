@@ -148,7 +148,7 @@ I have created one (for internal testing purposes) that you can use: [chrome-ext
 ### Extensions using messenger
 - [Restyler](https://chrome.google.com/webstore/detail/restyler/ofkkcnbmhaodoaehikkibjanliaeffel)
 - Working on one? let me know ext.messenger@gmail.com!
-[![](https://asimen1.github.io/chrome-ext-messenger/docs/images/mailicon.png "email")](mailto:ext.messenger@gmail.com)
+[![](https://asimen1.github.io/chrome-ext-messenger/images/mailicon.png "email")](mailto:ext.messenger@gmail.com)
 
 License
 ----
