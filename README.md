@@ -146,7 +146,9 @@ I have created one (for internal testing purposes) that you can use: [chrome-ext
     * **Different** - Async sendResponse is supported directly (no need to return "true" value like with _chrome.runtime.onMessage_).
 
 ### Extensions using messenger
-[Restyler](https://chrome.google.com/webstore/detail/restyler/ofkkcnbmhaodoaehikkibjanliaeffel)
+- [Restyler](https://chrome.google.com/webstore/detail/restyler/ofkkcnbmhaodoaehikkibjanliaeffel)
+- Working on one? let me know ext.messenger@gmail.com!
+[![](https://asimen1.github.io/chrome-ext-messenger/docs/images/mailicon.png "email")](mailto:ext.messenger@gmail.com)
 
 License
 ----
