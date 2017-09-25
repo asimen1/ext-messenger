@@ -13,7 +13,7 @@ Sending messages between extension parts can get complicated and usually require
 Furthermore the chrome messaging API is not coherent or straight forward, sometimes requiring you to use _chrome.runtime.\*_ and sometimes _chrome.tabs.\*_ depending on which extension part you are currently in.
 
 ### How?
-```javascript
+```
 npm i chrome-ext-messenger
 ```
 
@@ -39,7 +39,7 @@ let messenger = new Messenger();
  * {string} name - Identifier name for this connection.
  * {function} messageHandler - Handler for incoming messages.
  */
-messenger.initConnection(name, messageHandler)
+messenger.initConnection(name, messageHandler);
 ```
 
 This returns a **connection** object.
@@ -74,7 +74,7 @@ c.sendMessage('content_script:main,main2', { text: 'HI!' });
 c.sendMessage('devtool:*', { text: 'HI!' });
 
 // Disconnect the connection to stop listening for messages.
-c.disconnect()
+c.disconnect();
 ```
 
 ### For Example:
@@ -127,7 +127,7 @@ c.sendMessage('devtool:main:50', msg).then((response) => {
 ```
 
 ### Developing Locally
-```javascript
+```
 npm run dev
 ```
 
