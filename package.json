@@ -1,6 +1,6 @@
 {
   "name": "chrome-ext-messenger",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "author": "Asaf Menahem",
   "description": "Chrome extension message passing made easy",
   "main": "dist/chrome-ext-messenger.min.js",
