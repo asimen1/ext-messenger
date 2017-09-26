@@ -70,13 +70,15 @@ const Utils = {
         let retVal;
 
         if (typeof(chrome) !== 'undefined') {
-            // chrome.extension.getBackgroundPage() is available in background & popup.
-            if (chrome.extension && typeof chrome.extension.getBackgroundPage === 'function') {
+            // chrome.devtools is available in devtools panel.
+            // In latest Chrome, chrome.extension.getBackgroundPage() is available in background, popup & devtools.
+            if (chrome.devtools) {
+                retVal = Constants.DEVTOOL;
+            } else if (chrome.extension && typeof chrome.extension.getBackgroundPage === 'function') {
                 let backgroundPage = chrome.extension.getBackgroundPage();
                 retVal = backgroundPage === window ? Constants.BACKGROUND : Constants.POPUP;
             } else {
-                // chrome.devtools is available in devtools.
-                retVal = chrome.devtools ? Constants.DEVTOOL : Constants.CONTENT_SCRIPT;
+                retVal = Constants.CONTENT_SCRIPT;
             }
         } else {
             loggerError.error('Could not identify extension part... are you running in a chrome extension context?');
