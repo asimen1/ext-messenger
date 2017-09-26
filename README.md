@@ -13,8 +13,8 @@ Sending messages between extension parts can get complicated and usually require
 Furthermore the chrome messaging API is not coherent or straight forward, sometimes requiring you to use _chrome.runtime.\*_ and sometimes _chrome.tabs.\*_ depending on which extension part you are currently in.
 
 ### How?
-```
-npm i chrome-ext-messenger
+```shell
+$ npm i chrome-ext-messenger
 ```
 
 #### 1) In the background page: create a messenger instance and init the background hub.
@@ -127,8 +127,8 @@ c.sendMessage('devtool:main:50', msg).then((response) => {
 ```
 
 ### Developing Locally
-```
-npm run dev
+```shell
+$ npm run dev
 ```
 
 You can now use the built messenger from the _dist_ folder in a local test extension (or use [npm link](https://docs.npmjs.com/cli/link)).  
