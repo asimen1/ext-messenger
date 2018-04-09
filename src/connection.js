@@ -102,7 +102,7 @@ Connection.prototype._init = function(extPart, name, messageHandler) {
 // Clean up at sensible sizes.
 Connection.prototype._attemptDeadCbCleanup = function() {
     if (Object.keys(this._pendingCb).length > PENDING_CB_SIZE_CLEANUP_TRIGGER) {
-        Utils.log('log', '[Connection:_attemptDeadCbCleanup]', 'attempting dead callback cleaning... current callbacks number:'. Object.keys(this._pendingCb).length);
+        Utils.log('log', '[Connection:_attemptDeadCbCleanup]', 'Attempting dead callback cleaning... current callbacks number:'. Object.keys(this._pendingCb).length);
 
         let cleanUpToIndex = this._pendingCbCleanupIndex + PENDING_CB_SIZE_CLEANUP_AMOUNT;
         while (this._pendingCbCleanupIndex < cleanUpToIndex) {
@@ -110,7 +110,7 @@ Connection.prototype._attemptDeadCbCleanup = function() {
             this._pendingCbCleanupIndex++;
         }
 
-        Utils.log('log', '[Connection:_attemptDeadCbCleanup]', 'new callbacks number after cleaning done:', Object.keys(this._pendingCb).length);
+        Utils.log('log', '[Connection:_attemptDeadCbCleanup]', 'New callbacks number after cleaning done:', Object.keys(this._pendingCb).length);
     }
 };
 
@@ -210,7 +210,7 @@ Connection.prototype._handleResponse = function(response) {
         // Resolve the promise with the response callback value.
         cbPromiseResolve(response.cbValue);
     } else {
-        Utils.log('info', '[Connection:_handleResponse]', 'ignoring response sending because callback does not exist (probably already been called)');
+        Utils.log('info', '[Connection:_handleResponse]', 'Ignoring response sending because callback does not exist (probably already been called)');
     }
 };
 
@@ -309,7 +309,7 @@ Connection.prototype._onPortMessageHandler = function(message, fromPort) {
 Connection.prototype.sendMessage = function(to, message) {
     // Always returns a promise (callback support).
     return new Promise((cbPromiseResolve, reject) => {
-        if (!to) { Utils.log('error', '[Connection:sendMessage]', 'missing "to" arguments'); }
+        if (!to) { Utils.log('error', '[Connection:sendMessage]', 'Missing "to" arguments'); }
 
         if (!this._port) {
             Utils.log('info', '[Connection:sendMessage]', 'Rejecting sendMessage because connection does not exist anymore');

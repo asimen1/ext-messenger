@@ -180,7 +180,7 @@ BackgroundHub.prototype._relayMessage = function(message, fromPort) {
                 }
             });
         } else {
-            Utils.log('warn', '[BackgroundHub:_relayMessage]', 'could not find any connections with this name (probably no such name):', Utils.removeMessengerPortNamePrefix(toName));
+            Utils.log('warn', '[BackgroundHub:_relayMessage]', 'Could not find any connections with this name (probably no such name):', Utils.removeMessengerPortNamePrefix(toName));
         }
     }.bind(this));
 
@@ -211,7 +211,7 @@ BackgroundHub.prototype._onPortDisconnectionHandler = function(disconnectedPort)
             for (var j = portsArrLength; j >= 0; j--) {
                 let port = portsArr[j];
                 if (port === disconnectedPort) {
-                    Utils.log('log', '[BackgroundHub:_onPortDisconnectionHandler]', 'remove connection of port with unique id: ', currPortKey);
+                    Utils.log('log', '[BackgroundHub:_onPortDisconnectionHandler]', 'Remove connection of port with unique id: ', currPortKey);
                     portsArr.splice(j, 1);
 
                     // Invoke the user disconnected handler if given.
@@ -229,7 +229,7 @@ BackgroundHub.prototype._onPortDisconnectionHandler = function(disconnectedPort)
 
             // If all ports removed, remove it from our stored ports object and invoke disconnect handler if given.
             if (portsObj[currPortKey].length === 0) {
-                Utils.log('log', '[BackgroundHub:_onPortDisconnectionHandler]', 'removing empty ports object for unique id: ', currPortKey);
+                Utils.log('log', '[BackgroundHub:_onPortDisconnectionHandler]', 'Removing empty ports object for unique id: ', currPortKey);
                 delete portsObj[currPortKey];
             }
         }

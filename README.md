@@ -27,8 +27,7 @@ messenger.initBackgroundHub();
 
 This step is **obligatory** and should be done as early as possible in your background page.
 
-\* If you're not working with npm or module packing, add the [library](https://github.com/asimen1/chrome-ext-messenger/tree/master/dist) via script tag and use
-_window['chrome-ext-messenger']_.
+\* If you're using npm or module packing, add the [library](https://github.com/asimen1/chrome-ext-messenger/tree/master/dist) via script tag and use `window['chrome-ext-messenger']`.
 
 #### 2) Init connections (in any extension parts).
 ```javascript
@@ -64,8 +63,8 @@ This returns a **promise**.
 ```javascript
 // Init hub with handlers notifying someone connected/disconnected.
 messenger.initBackgroundHub({
-    connectedHandler: (extensionPart, connectionName, tabId) => {},
-    disconnectedHandler: (extensionPart, connectionName, tabId) => {}
+    connectedHandler: function(extensionPart, connectionName, tabId) {},
+    disconnectedHandler: function(extensionPart, connectionName, tabId) {}
 });
 
 // Sending to multiple connections is supported via:
@@ -140,7 +139,7 @@ I have created one (for internal testing purposes) that you can use: [chrome-ext
 * Requires your extension to have ["tabs" permission](https://developer.chrome.com/extensions/declare_permissions).
 * Uses only long lived port connections via _chrome.runtime.*_ API.
 * This library should satisfy all your message passing demands, however if you are still handling some port connections manually using _chrome.runtime.onConnect_, you will also receive messenger ports connections. In order to identify connections originating from this library you can use the static method **Messenger.isMessengerPort(port)** which will return true/false.
-* The Messenger messageHandler and _chrome.runtime.onMessage_ similarities and differences:
+* The Messenger _messageHandler_ and _chrome.runtime.onMessage_ similarities and differences:
     * **Same** - "sender" object.
     * **Same** - "sendResponse" - The argument should be any JSON-ifiable object.
     * **Same** - "sendResponse" - With multiple message handler, the sendResponse() will work only for the first one to respond.  
@@ -149,8 +148,7 @@ I have created one (for internal testing purposes) that you can use: [chrome-ext
 
 ### Extensions using messenger
 - [Restyler](https://chrome.google.com/webstore/detail/restyler/ofkkcnbmhaodoaehikkibjanliaeffel)
-- Working on one? let me know ext.messenger@gmail.com!
-[![](https://asimen1.github.io/chrome-ext-messenger/images/mailicon.png "email")](mailto:ext.messenger@gmail.com)
+- Working on one? let me know ext.messenger@gmail.com! [![](https://asimen1.github.io/chrome-ext-messenger/images/mailicon.png "email")](mailto:ext.messenger@gmail.com)
 
 License
 ----
