@@ -56,7 +56,9 @@ connection.sendMessage(to, message);
 * \<extension part> possible values: 'background', 'content_script', 'popup', 'devtool'.
 * Sending messages from background require an additional tab id argument ':\<tab id>'.
 
-This returns a **promise** that will be resolved if the receiver message handler invoked _"sendResponse"_.
+This returns a **promise**.  
+\- The promise will be resolved if the receiver invoked the `sendResponse` method argument.  
+\- The promise will be rejected if connection has been disconnected using the `disconnect()` API.
 
 #### More:
 ```javascript

@@ -308,33 +308,34 @@ Connection.prototype._onPortMessageHandler = function(message, fromPort) {
 
 Connection.prototype.sendMessage = function(to, message) {
     // Always returns a promise (callback support).
-    return new Promise((cbPromiseResolve) => {
+    return new Promise((cbPromiseResolve, reject) => {
         if (!to) { Utils.log('error', '[Connection:sendMessage]', 'missing "to" arguments'); }
 
-        if (this._port) {
-            // Parse 'to' to args... for example => 'devtool:main:1225'
-            let toArgs;
-            try {
-                toArgs = to.split(':');
-            } catch (e) {
-                Utils.log('error', '[Connection:sendMessage]', 'Invalid format given in "to" argument: ' + to, arguments);
-            }
-
-            let toExtPart = toArgs[0];
-            let toName = toArgs[1];
-            let toTabId = toArgs[2];
-
-            // Validate (will throw error if something is invalid).
-            let errorMsg = this._validateMessage(toExtPart, toName, toTabId);
-            if (errorMsg) { Utils.log('error', '[Connection:sendMessage]', errorMsg, arguments); }
-
-            // Normalize to array to support multiple names.
-            let toNames = toName.split(',');
-
-            this._sendMessage(this._port, toExtPart, toNames, toTabId, message, cbPromiseResolve);
-        } else {
-            Utils.log('warn', '[Connection:sendMessage]', 'ignoring sending message because connection does not exist anymore, did you disconnected it?');
+        if (!this._port) {
+            Utils.log('info', '[Connection:sendMessage]', 'Rejecting sendMessage because connection does not exist anymore');
+            return reject(new Error('Connection port does not exist anymore, did you disconnect it?'));
         }
+
+        // Parse 'to' to args... for example => 'devtool:main:1225'
+        let toArgs;
+        try {
+            toArgs = to.split(':');
+        } catch (e) {
+            Utils.log('error', '[Connection:sendMessage]', 'Invalid format given in "to" argument: ' + to, arguments);
+        }
+
+        let toExtPart = toArgs[0];
+        let toName = toArgs[1];
+        let toTabId = toArgs[2];
+
+        // Validate (will throw error if something is invalid).
+        let errorMsg = this._validateMessage(toExtPart, toName, toTabId);
+        if (errorMsg) { Utils.log('error', '[Connection:sendMessage]', errorMsg, arguments); }
+
+        // Normalize to array to support multiple names.
+        let toNames = toName.split(',');
+
+        this._sendMessage(this._port, toExtPart, toNames, toTabId, message, cbPromiseResolve);
     });
 };
 
