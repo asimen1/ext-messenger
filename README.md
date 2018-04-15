@@ -1,5 +1,8 @@
 ## Chrome extension message passing made easy
 
+[![Latest Stable Version](https://img.shields.io/npm/v/chrome-ext-messenger.svg)](https://www.npmjs.com/package/chrome-ext-messenger)
+[![NPM Downloads](https://img.shields.io/npm/dt/chrome-ext-messenger.svg)](https://www.npmjs.com/package/chrome-ext-messenger)
+
 ### What?
 
 Small library for messaging across any extension parts (background, content script, popup or devtool).
@@ -127,14 +130,6 @@ c.sendMessage('devtool:main:50', msg).then((response) => {
 });
 ```
 
-### Developing Locally
-```shell
-$ npm run dev
-```
-
-You can now use the built messenger from the _dist_ folder in a local test extension (or use [npm link](https://docs.npmjs.com/cli/link)).  
-I have created one (for internal testing purposes) that you can use: [chrome-ext-messenger-test](https://github.com/asimen1/chrome-ext-messenger-test).
-
 ### Notes
 * Requires your extension to have ["tabs" permission](https://developer.chrome.com/extensions/declare_permissions).
 * Uses only long lived port connections via _chrome.runtime.*_ API.
@@ -149,6 +144,14 @@ I have created one (for internal testing purposes) that you can use: [chrome-ext
 ### Extensions using messenger
 - [Restyler](https://chrome.google.com/webstore/detail/restyler/ofkkcnbmhaodoaehikkibjanliaeffel)
 - Working on one? let me know ext.messenger@gmail.com! [![](https://asimen1.github.io/chrome-ext-messenger/images/mailicon.png "email")](mailto:ext.messenger@gmail.com)
+
+### Developing Locally
+```shell
+$ npm run dev
+```
+
+You can now use the built messenger from the _dist_ folder in a local test extension (or use [npm link](https://docs.npmjs.com/cli/link)).  
+I have created one (for internal testing purposes) that you can use: [chrome-ext-messenger-test](https://github.com/asimen1/chrome-ext-messenger-test).
 
 License
 ----
