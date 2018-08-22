@@ -13,7 +13,7 @@ Works both for Chrome extensions and Firefox add-ons, has a simple API, promise 
 
 Sending messages between extension parts can get complicated and usually requires some relaying mechanism in the background page. Adding callback functionality to these messages can make it even trickier.
 
-Furthermore the messaging API is not coherent or straight forward, sometimes requiring you to use _runtime.\*_ API and sometimes _tabs.\*_ API depending on which extension part you are currently in.
+Furthermore, the messaging API is not coherent or straight forward, sometimes requiring you to use _runtime.\*_ API and sometimes _tabs.\*_ API depending on which extension part you are currently in.
 
 ### How?
 ```shell
@@ -28,7 +28,7 @@ let messenger = new Messenger();
 messenger.initBackgroundHub();
 ```
 
-This step is **obligatory** and should be done as early as possible in your background page.
+This step is **obligatory** and should be done as soon as possible in your background page.
 
 \* You can also add the [library](https://github.com/asimen1/ext-messenger/tree/master/dist) via script tag and use `window['ext-messenger']`.
 
@@ -60,7 +60,7 @@ connection.sendMessage(to, message);
 
 This returns a **promise**.  
 \- The promise will be resolved if the receiver invoked the `sendResponse` method argument.  
-\- The promise will be rejected if connection has been disconnected using the `disconnect()` API.
+\- The promise will be rejected if connection has been disconnected via the `disconnect()` API.
 
 #### More:
 ```javascript
