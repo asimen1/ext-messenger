@@ -1,6 +1,6 @@
 {
   "name": "ext-messenger",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "author": "Asaf Menahem",
   "description": "Extension message passing made easy",
   "main": "dist/ext-messenger.min.js",
