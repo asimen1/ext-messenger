@@ -1,28 +1,28 @@
-## Chrome extension message passing made easy
+## Extension message passing made easy
 
-[![Latest Stable Version](https://img.shields.io/npm/v/chrome-ext-messenger.svg)](https://www.npmjs.com/package/chrome-ext-messenger)
-[![NPM Downloads](https://img.shields.io/npm/dt/chrome-ext-messenger.svg)](https://www.npmjs.com/package/chrome-ext-messenger)
+[![Latest Stable Version](https://img.shields.io/npm/v/ext-messenger.svg)](https://www.npmjs.com/package/ext-messenger)
+[![NPM Downloads](https://img.shields.io/npm/dt/ext-messenger.svg)](https://www.npmjs.com/package/ext-messenger)
 
 ### What?
 
 Small library for messaging across any extension parts (background, content script, popup or devtool).
 
-It has a simple easy to use API, promise based callback support and more.
+Works both for Chrome extensions and Firefox add-ons, has a simple API, promise based callback support and more.
 
 ### Why?
 
 Sending messages between extension parts can get complicated and usually requires some relaying mechanism in the background page. Adding callback functionality to these messages can make it even trickier.
 
-Furthermore the chrome messaging API is not coherent or straight forward, sometimes requiring you to use _chrome.runtime.\*_ and sometimes _chrome.tabs.\*_ depending on which extension part you are currently in.
+Furthermore the messaging API is not coherent or straight forward, sometimes requiring you to use _runtime.\*_ API and sometimes _tabs.\*_ API depending on which extension part you are currently in.
 
 ### How?
 ```shell
-$ npm i chrome-ext-messenger
+$ npm i ext-messenger --save
 ```
 
 #### 1) In the background page: create a messenger instance and init the background hub.
 ```javascript
-const Messenger = require('chrome-ext-messenger');
+const Messenger = require('ext-messenger');
 let messenger = new Messenger();
 
 messenger.initBackgroundHub();
@@ -30,11 +30,11 @@ messenger.initBackgroundHub();
 
 This step is **obligatory** and should be done as early as possible in your background page.
 
-\* You can also add the [library](https://github.com/asimen1/chrome-ext-messenger/tree/master/dist) via script tag and use `window['chrome-ext-messenger']`.
+\* You can also add the [library](https://github.com/asimen1/ext-messenger/tree/master/dist) via script tag and use `window['ext-messenger']`.
 
 #### 2) Init connections (in any extension parts).
 ```javascript
-const Messenger = require('chrome-ext-messenger');
+const Messenger = require('ext-messenger');
 let messenger = new Messenger();
 
 /*
@@ -87,7 +87,7 @@ c.disconnect();
 /* Init connections in desired extension part     */
 /* (BACKGROUND, CONTENT_SCRIPT, POPUP, DEVTOOL)   */
 /* ---------------------------------------------- */
-const Messenger = require('chrome-ext-messenger');
+const Messenger = require('ext-messenger');
 let messenger = new Messenger();
 
 let messageHandler = function(msg, from, sender, sendResponse) {
@@ -132,18 +132,18 @@ c.sendMessage('devtool:main:50', msg).then((response) => {
 
 ### Notes
 * Requires your extension to have ["tabs" permission](https://developer.chrome.com/extensions/declare_permissions).
-* Uses only long lived port connections via _chrome.runtime.*_ API.
-* This library should satisfy all your message passing demands, however if you are still handling some port connections manually using _chrome.runtime.onConnect_, you will also receive messenger ports connections. In order to identify connections originating from this library you can use the static method **Messenger.isMessengerPort(port)** which will return true/false.
-* The Messenger _messageHandler_ and _chrome.runtime.onMessage_ similarities and differences:
+* Uses only long lived port connections via _runtime.*_ API.
+* This library should satisfy all your message passing needs, however if you are still handling some port connections manually, using _runtime.onConnect_ will also receive messenger ports connections. In order to identify connections originating from this library you can use the static method **Messenger.isMessengerPort(port)** which will return true/false.
+* The Messenger _messageHandler_ and _runtime.onMessage_ similarities and differences:
     * **Same** - "sender" object.
     * **Same** - "sendResponse" - The argument should be any JSON-ifiable object.
     * **Same** - "sendResponse" - With multiple message handler, the sendResponse() will work only for the first one to respond.  
     * **Different** - "from" object indicating the senders formatted identifier e.g. 'devtool:connection name'.
-    * **Different** - Async sendResponse is supported directly (no need to return "true" value like with _chrome.runtime.onMessage_).
+    * **Different** - Async sendResponse is supported directly (no need to return "true" value like with _runtime.onMessage_).
 
 ### Extensions using messenger
 - [Restyler](https://chrome.google.com/webstore/detail/restyler/ofkkcnbmhaodoaehikkibjanliaeffel)
-- Working on one? let me know ext.messenger@gmail.com! [![](https://asimen1.github.io/chrome-ext-messenger/images/mailicon.png "email")](mailto:ext.messenger@gmail.com)
+- Working on one? let me know ext.messenger@gmail.com! [![](https://asimen1.github.io/ext-messenger/images/mailicon.png "email")](mailto:ext.messenger@gmail.com)
 
 ### Developing Locally
 ```shell
@@ -151,7 +151,7 @@ $ npm run dev
 ```
 
 You can now use the built messenger from the _dist_ folder in a local test extension (or use [npm link](https://docs.npmjs.com/cli/link)).  
-I have created one (for internal testing purposes) that you can use: [chrome-ext-messenger-test](https://github.com/asimen1/chrome-ext-messenger-test).
+I have created one (for internal testing purposes) that you can use: [ext-messenger-test](https://github.com/asimen1/ext-messenger-test).
 
 License
 ----

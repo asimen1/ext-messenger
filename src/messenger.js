@@ -1,3 +1,9 @@
+/**
+ * NOTE: Although this library is using only chrome.* extension API (and not browser.*),
+ * NOTE: Firefox supports this API namespace on their end, so this library also works in Firefox.
+ * NOTE: More info: https://github.com/asimen1/chrome-ext-messenger/issues/5
+ */
+
 'use strict';
 
 const BackgroundHub = require('./backgroundHub.js');

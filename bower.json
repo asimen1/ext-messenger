@@ -1,18 +1,19 @@
 {
-  "name": "chrome-ext-messenger",
-  "description": "Chrome extension message passing made easy",
-  "main": "dist/chrome-ext-messenger.min.js",
+  "name": "ext-messenger",
+  "description": "Extension message passing made easy",
+  "main": "dist/ext-messenger.min.js",
   "authors": [
     "Asaf Menahem"
   ],
   "license": "MIT",
   "keywords": [
     "chrome extension",
+    "firefox add-on",
     "message passing",
     "messenger",
     "messages"
   ],
-  "homepage": "https://github.com/asimen1/chrome-ext-messenger",
+  "homepage": "https://github.com/asimen1/ext-messenger",
   "ignore": [
     "**/.*",
     "node_modules",

@@ -65,7 +65,7 @@ const Utils = {
         }
     },
 
-    // TODO: export to npm package... chrome-ext-context/scope
+    // TODO: export to npm package... ext-context/scope
     getCurrentExtensionPart: function() {
         let retVal;
 

@@ -20,8 +20,8 @@ var config = {
 
     output: {
         path: path.join(__dirname, 'dist'),
-        filename: 'chrome-ext-messenger.min.js',
-        library: 'chrome-ext-messenger',
+        filename: 'ext-messenger.min.js',
+        library: 'ext-messenger',
         libraryTarget: 'umd',
         umdNamedDefine: true
     },
