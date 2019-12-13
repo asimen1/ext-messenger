@@ -81,7 +81,7 @@ const Utils = {
                 retVal = Constants.CONTENT_SCRIPT;
             }
         } else {
-            loggerError.error('Could not identify extension part... are you running in a chrome extension context?');
+            loggerError.error('Could not identify extension part... are you running in an extension context?');
         }
 
         loggerLog.log('detected current extension part: ' + retVal);
