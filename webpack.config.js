@@ -1,40 +1,30 @@
-/* eslint-env node, node */
+/* eslint-env node */
 
 const path = require('path');
-const webpack = require('webpack');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-var plugins = [new CleanWebpackPlugin(['dist'])];
+module.exports = (env, argv) => {
+    let mode = argv.mode ?? 'production';
 
-var env = process.env.WEBPACK_ENV;
-if (env === 'build') {
-    plugins.push(new webpack.optimize.UglifyJsPlugin({
-        minimize: true
-    }));
-}
+    return {
+        mode: mode,
 
-var config = {
-    devtool: 'source-map',
+        // NOTE: This is important to create a CSP compliant output that doesn't use eval and
+        // NOTE: therefore doesn't require "unsafe-eval" policy declaration in the manifest.json.
+        devtool: 'source-map',
 
-    entry: path.join(__dirname, 'src', 'messenger.js'),
+        entry: path.join(__dirname, 'src', 'messenger.js'),
 
-    output: {
-        path: path.join(__dirname, 'dist'),
-        filename: 'ext-messenger.min.js',
-        library: 'ext-messenger',
-        libraryTarget: 'umd',
-        umdNamedDefine: true
-    },
+        output: {
+            path: path.join(__dirname, 'dist'),
+            filename: 'ext-messenger.min.js',
+            library: 'ext-messenger',
+            libraryTarget: 'umd',
+            umdNamedDefine: true,
+        },
 
-    plugins: plugins,
-
-    module: {
-        loaders: [{
-            test: /\.js$/,
-            exclude: /node_modules/,
-            loader: 'babel-loader'
-        }]
-    }
+        plugins: [
+            new CleanWebpackPlugin(),
+        ],
+    };
 };
-
-module.exports = config;

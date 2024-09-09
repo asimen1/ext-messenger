@@ -17,7 +17,7 @@ const constants = {
     INIT: 'init',
     INIT_SUCCESS: 'init_success',
     MESSAGE: 'message',
-    RESPONSE: 'response'
+    RESPONSE: 'response',
 };
 
 export default constants;

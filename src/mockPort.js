@@ -1,131 +1,133 @@
-const Utils = require('./utils.js');
+'use strict';
 
-const MockPort = function(options) {
-    Utils.constructorTweakMethods('MockPort', this);
+import Utils from './utils.js';
 
-    let creatorMock = this._createMockPort(options);
-    let targetMock = this._createMockPort(options);
+class MockPort {
+    constructor(options) {
+        Utils.constructorTweakMethods('MockPort', this);
 
-    this._linkMocks(creatorMock, targetMock);
+        let creatorMock = this._createMockPort(options);
+        let targetMock = this._createMockPort(options);
 
-    // BackgroundHub might not have created this "onConnect" method yet.
-    if (typeof window.mockPortOnConnect === 'function') {
-        window.mockPortOnConnect(targetMock);
+        this._linkMocks(creatorMock, targetMock);
+
+        // BackgroundHub might not have created this "onConnect" method yet.
+        if (self && typeof self.mockPortOnConnect === 'function') {
+            self.mockPortOnConnect(targetMock);
+        }
+
+        return creatorMock;
     }
 
-    return creatorMock;
-};
+    _createMockPort(options) {
+        // ------------------------------------------
+        // Port API
+        // ------------------------------------------
 
-MockPort.prototype.constructor = MockPort;
+        let mockPort = {
+            _connected: true,
 
-MockPort.prototype._createMockPort = function(options) {
-    // ------------------------------------------
-    // Port API
-    // ------------------------------------------
+            _name: options.name,
+            onMessageListeners: [],
+            onDisconnectListeners: [],
+        };
 
-    let mockPort = {
-        _connected: true,
+        Object.defineProperty(mockPort, 'name', {
+            get: function() {
+                return mockPort._name;
+            },
+        });
 
-        _name: options.name,
-        onMessageListeners: [],
-        onDisconnectListeners: []
-    };
+        Object.defineProperty(mockPort, 'onMessage', {
+            get: function() {
+                return {
+                    addListener: function(listener) {
+                        mockPort.onMessageListeners.push(listener);
+                    },
 
-    Object.defineProperty(mockPort, 'name', {
-        get: function() {
-            return mockPort._name;
-        }
-    });
+                    removeListener: function(listener) {
+                        let index = mockPort.onMessageListeners.indexOf(listener);
+                        if (index !== -1) {
+                            mockPort.onMessageListeners.splice(index, 1);
+                        }
+                    },
+                };
+            },
+        });
 
-    Object.defineProperty(mockPort, 'onMessage', {
-        get: function() {
-            return {
-                addListener: function(listener) {
-                    mockPort.onMessageListeners.push(listener);
-                },
+        Object.defineProperty(mockPort, 'onDisconnect', {
+            get: function() {
+                return {
+                    addListener: function(listener) {
+                        mockPort.onDisconnectListeners.push(listener);
+                    },
 
-                removeListener: function(listener) {
-                    let index = mockPort.onMessageListeners.indexOf(listener);
-                    if (index !== -1) {
-                        mockPort.onMessageListeners.splice(index, 1);
-                    }
+                    removeListener: function(listener) {
+                        let index = mockPort.onDisconnectListeners.indexOf(listener);
+                        if (index !== -1) {
+                            mockPort.onDisconnectListeners.splice(index, 1);
+                        }
+                    },
+                };
+            },
+        });
+
+        // Background mock ports should only have the extension id.
+        // https://developer.chrome.com/extensions/runtime#type-MessageSender
+        Object.defineProperty(mockPort, 'sender', {
+            get: function() {
+                return { id: chrome.runtime.id };
+            },
+        });
+
+        mockPort.postMessage = function(msg) {
+            if (mockPort._connected) {
+                if (mockPort.__targetRefPort) {
+                    mockPort.__targetRefPort.__invokeOnMessageHandlers(msg);
+                } else {
+                    Utils.log('warn', '[MockPort:postMessage]', 'Missing __targetRefPort', arguments);
                 }
-            };
-        }
-    });
+            } else {
+                Utils.log('warn', '[MockPort:postMessage]', 'Attempting to post message on a disconnected mock port', msg);
+            }
+        };
 
-    Object.defineProperty(mockPort, 'onDisconnect', {
-        get: function() {
-            return {
-                addListener: function(listener) {
-                    mockPort.onDisconnectListeners.push(listener);
-                },
+        mockPort.disconnect = function() {
+            mockPort._connected = false;
 
-                removeListener: function(listener) {
-                    let index = mockPort.onDisconnectListeners.indexOf(listener);
-                    if (index !== -1) {
-                        mockPort.onDisconnectListeners.splice(index, 1);
-                    }
-                }
-            };
-        }
-    });
-
-    // Background mock ports should only have the extension id.
-    // https://developer.chrome.com/extensions/runtime#type-MessageSender
-    Object.defineProperty(mockPort, 'sender', {
-        get: function() {
-            return { id: chrome.runtime.id };
-        }
-    });
-
-    mockPort.postMessage = function(msg) {
-        if (mockPort._connected) {
             if (mockPort.__targetRefPort) {
-                mockPort.__targetRefPort.__invokeOnMessageHandlers(msg);
+                mockPort.__targetRefPort.__invokeOnDisconnectHandlers();
             } else {
                 Utils.log('warn', '[MockPort:postMessage]', 'Missing __targetRefPort', arguments);
             }
-        } else {
-            Utils.log('warn', '[MockPort:postMessage]', 'Attempting to post message on a disconnected mock port', msg);
-        }
-    };
 
-    mockPort.disconnect = function() {
-        mockPort._connected = false;
+            mockPort._onMessageListeners = [];
+            mockPort._onDisconnectListeners = [];
+        };
 
-        if (mockPort.__targetRefPort) {
-            mockPort.__targetRefPort.__invokeOnDisconnectHandlers();
-        } else {
-            Utils.log('warn', '[MockPort:postMessage]', 'Missing __targetRefPort', arguments);
-        }
+        // ------------------------------------------
+        // PRIVATE HELPERS
+        // ------------------------------------------
 
-        mockPort._onMessageListeners = [];
-        mockPort._onDisconnectListeners = [];
-    };
+        mockPort.__invokeOnMessageHandlers = function(msg) {
+            mockPort.onMessageListeners.forEach(function(onMessageListener) {
+                onMessageListener(msg, mockPort);
+            });
+        };
 
-    // ------------------------------------------
-    // PRIVATE HELPERS
-    // ------------------------------------------
+        mockPort.__invokeOnDisconnectHandlers = function() {
+            mockPort.onDisconnectListeners.forEach(function(onDisconnectListener) {
+                onDisconnectListener(mockPort);
+            });
+        };
 
-    mockPort.__invokeOnMessageHandlers = function(msg) {
-        mockPort.onMessageListeners.forEach(function(onMessageListener) {
-            onMessageListener(msg, mockPort);
-        });
-    };
+        return mockPort;
+    }
 
-    mockPort.__invokeOnDisconnectHandlers = function() {
-        mockPort.onDisconnectListeners.forEach(function(onDisconnectListener) {
-            onDisconnectListener(mockPort);
-        });
-    };
-
-    return mockPort;
-};
-
-MockPort.prototype._linkMocks = function(creatorMock, targetMock) {
-    creatorMock.__targetRefPort = targetMock;
-    targetMock.__targetRefPort = creatorMock;
-};
+    _linkMocks(creatorMock, targetMock) {
+        creatorMock.__targetRefPort = targetMock;
+        targetMock.__targetRefPort = creatorMock;
+    }
+}
 
 export default MockPort;

@@ -1,73 +1,79 @@
-/**
- * NOTE: Although this library is using only chrome.* extension API (and not browser.*),
- * NOTE: Firefox supports this API namespace on their end, so this library also works in Firefox.
- * NOTE: More info: https://github.com/asimen1/chrome-ext-messenger/issues/5
- */
-
 'use strict';
 
-const BackgroundHub = require('./backgroundHub.js');
-const Connection = require('./connection.js');
-const Utils = require('./utils.js');
-const Constants = require('./constants.js');
+import BackgroundHub from './backgroundHub.js';
+import Connection from './connection.js';
+import Utils from './utils.js';
+import Constants from './constants.js';
 
 // --------------------------------------------------------
 // THE MESSENGER !
 // --------------------------------------------------------
 
-const Messenger = function() {
-    Utils.constructorTweakMethods('Messenger', this);
+class Messenger {
+    constructor(extPart) {
+        Utils.constructorTweakMethods('Messenger', this);
 
-    this._myExtPart = Utils.getCurrentExtensionPart();
-};
+        // Validate extension part argument.
+        if (!Object.values(Messenger.EXT_PARTS).includes(extPart)) {
+            Utils.log('error', '[Messenger:constructor]', `"${extPart}" provided is not a valid extension part. Valid parts are: ${Object.keys(Messenger.EXT_PARTS).join(', ')}`);
+            return;
+        }
 
-Messenger.prototype.constructor = Messenger;
+        this._myExtPart = extPart;
 
-// ------------------------------------------------------------
-// "STATIC" Methods - start
-// ------------------------------------------------------------
+        let api = {
+            initConnection: this.initConnection,
+        };
 
-Messenger.isMessengerPort = function(port) {
-    return port.name.indexOf(Constants.MESSENGER_PORT_NAME_PREFIX) === 0;
-};
+        // Add the BackgroundHub API only for the background part.
+        if (this._myExtPart === Constants.BACKGROUND) {
+            api.initBackgroundHub = this.initBackgroundHub;
+        }
 
-// ------------------------------------------------------------
-// "STATIC" Methods - end
-// ------------------------------------------------------------
-
-// ------------------------------------------------------------
-// Exposed API - start.
-// ------------------------------------------------------------
-
-Messenger.prototype.initBackgroundHub = function(options) {
-    if (this._myExtPart !== Constants.BACKGROUND) {
-        Utils.log('warn', '[Messenger:initBackgroundHub]', 'Ignoring BackgroundHub init request since not called from background context');
-        return;
+        return api;
     }
 
-    if (this._backgroundHub) {
-        Utils.log('warn', '[Messenger:initBackgroundHub]', 'Ignoring BackgroundHub init request since it is already been inited');
-        return;
+    static isMessengerPort(port) {
+        return port.name.indexOf(Constants.MESSENGER_PORT_NAME_PREFIX) === 0;
     }
 
-    // NOTE: Saving reference in order to identify later if was already created.
-    this._backgroundHub = new BackgroundHub(options);
-};
+    static EXT_PARTS = {
+        BACKGROUND: Constants.BACKGROUND,
+        POPUP: Constants.POPUP,
+        DEVTOOL: Constants.DEVTOOL,
+        CONTENT_SCRIPT: Constants.CONTENT_SCRIPT,
+    };
 
-Messenger.prototype.initConnection = function(name, messageHandler) {
-    if (!name) {
-        Utils.log('error', '[Messenger:initConnection]', 'Missing "name" in arguments');
+    // ------------------------------------------------------------
+    // Exposed API
+    // ------------------------------------------------------------
+
+    initBackgroundHub(options) {
+        if (this._myExtPart !== Constants.BACKGROUND) {
+            Utils.log('warn', '[Messenger:initBackgroundHub]', 'Ignoring BackgroundHub init request since not called from background context');
+            return;
+        }
+
+        if (this._backgroundHub) {
+            Utils.log('warn', '[Messenger:initBackgroundHub]', 'Ignoring BackgroundHub init request since it is already been inited');
+            return;
+        }
+
+        // NOTE: Saving reference in order to identify later if was already created.
+        this._backgroundHub = new BackgroundHub(options);
     }
 
-    if (name === Constants.TO_NAME_WILDCARD) {
-        Utils.log('error', '[Messenger:initConnection]', '"*" is reserved as a wildcard identifier, please use another name');
+    initConnection(name, messageHandler) {
+        if (!name) {
+            Utils.log('error', '[Messenger:initConnection]', 'Missing "name" in arguments');
+        }
+
+        if (name === Constants.TO_NAME_WILDCARD) {
+            Utils.log('error', '[Messenger:initConnection]', '"*" is reserved as a wildcard identifier, please use another name');
+        }
+
+        return new Connection(this._myExtPart, name, messageHandler);
     }
+}
 
-    return new Connection(this._myExtPart, name, messageHandler);
-};
-
-// ------------------------------------------------------------
-// Exposed API - end.
-// ------------------------------------------------------------
-
-module.exports = Messenger;
+export default Messenger;

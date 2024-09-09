@@ -1,96 +1,90 @@
 'use strict';
 
-const Logdown = require('logdown');
+import Constants from './constants.js';
 
-const Constants = require('./constants.js');
+const LOG_LEVEL = 'warn';
+const LOG_LEVELS = ['log', 'info', 'warn', 'error'];
+const LOG_PREFIX = '[ext-messenger]';
 
-// NOTE: Until https://github.com/caiogondim/logdown.js/issues/82 is implemented.
-const loggerLog   = new Logdown({ prefix: 'messenger-log', markdown: false });
-const loggerInfo  = new Logdown({ prefix: 'messenger-info', markdown: false });
-const loggerWarn  = new Logdown({ prefix: 'messenger-warn', markdown: false });
-const loggerError = new Logdown({ prefix: 'messenger-error', markdown: false });
-// Disables all instances with the 'messenger' prefix, but don't disable those in the negation.
-Logdown.disable('messenger*', '-messenger-error', '-messenger-warn'/*, '-messenger-info', '-messenger-log'*/);
-
-const Utils = {
-    log: function(level) {
-        // Remove the 'level' argument.
-        var loggerArgs = Array.prototype.slice.call(arguments, 1);
-
-        switch (level) {
-            case 'log': {
-                loggerLog.log.apply(loggerLog, loggerArgs);
-                break;
-            }
-            case 'info': {
-                loggerInfo.info.apply(loggerInfo, loggerArgs);
-                break;
-            }
-            case 'warn': {
-                loggerWarn.warn.apply(loggerWarn, loggerArgs);
-                break;
-            }
-            case 'error': {
-                loggerError.error.apply(loggerError, loggerArgs);
-
-                // Abort execution on error.
-                throw 'Messenger error occurred, check more information above...';
-            }
-
-            default: {
-                loggerError.error('Unknown log level: ' + level);
-                break;
-            }
-        }
-    },
-
-    // For each function:
-    // - Autobinding to ensure correct 'this' from all types of function invocations.
-    // - Add log level logging.
-    constructorTweakMethods: function(filename, thisObj) {
-        let wrapMethod = function(methodName) {
-            let origFunc = thisObj[methodName];
-
-            thisObj[methodName] = function() {
-                loggerLog.log('[' + filename + ':' + methodName + '()]', arguments);
-
-                return origFunc.apply(thisObj, arguments);
-            }.bind(thisObj);
-        };
-
-        for (let key in thisObj) {
-            if (typeof thisObj[key] === 'function') {
-                wrapMethod(key);
-            }
-        }
-    },
-
-    // TODO: export to npm package... ext-context/scope
-    getCurrentExtensionPart: function() {
-        let retVal;
-
-        if (typeof(chrome) !== 'undefined') {
-            // chrome.devtools is available in devtools panel.
-            // In latest Chrome, chrome.extension.getBackgroundPage() is available in background, popup & devtools.
-            if (chrome.devtools) {
-                retVal = Constants.DEVTOOL;
-            } else if (chrome.extension && typeof chrome.extension.getBackgroundPage === 'function') {
-                let backgroundPage = chrome.extension.getBackgroundPage();
-                retVal = backgroundPage === window ? Constants.BACKGROUND : Constants.POPUP;
-            } else {
-                retVal = Constants.CONTENT_SCRIPT;
-            }
-        } else {
-            loggerError.error('Could not identify extension part... are you running in an extension context?');
-        }
-
-        loggerLog.log('detected current extension part: ' + retVal);
-        return retVal;
-    },
-
-    removeMessengerPortNamePrefix: function(portName) {
-        return portName.replace(new RegExp('^' + Constants.MESSENGER_PORT_NAME_PREFIX), '');
-    }
+// ANSI color codes.
+const COLORS = {
+    log: '\x1b[32m', // green
+    info: '\x1b[34m', // blue
 };
 
-export default Utils;
+function shouldLog(logLevel) {
+    return LOG_LEVELS.indexOf(logLevel) >= LOG_LEVELS.indexOf(LOG_LEVEL);
+}
+
+function log(level) {
+    // Remove the 'level' argument.
+    let loggerArgs = Array.prototype.slice.call(arguments, 1);
+
+    if (!shouldLog(level)) {
+        return;
+    }
+
+    switch (level) {
+        case 'log': {
+            console.log(COLORS.log + LOG_PREFIX + ` [${level}]`, ...loggerArgs);
+            break;
+        }
+        case 'info': {
+            console.info(COLORS.info + LOG_PREFIX + ` [${level}]`, ...loggerArgs);
+            break;
+        }
+        case 'warn': {
+            console.warn(LOG_PREFIX, ...loggerArgs);
+            break;
+        }
+        case 'error': {
+            console.error(LOG_PREFIX, ...loggerArgs);
+
+            // Abort execution on error.
+            throw '[ext-messenger] error occurred, check more information above...';
+        }
+
+        default: {
+            console.error(LOG_PREFIX, `Unknown log level: ${level}`);
+            break;
+        }
+    }
+}
+
+// For each function:
+// - Add log level logging.
+// - Autobinding to ensure correct 'this' from all types of function invocations.
+function constructorTweakMethods(filename, thisObj) {
+    let wrapMethod = function(methodName) {
+        let origFunc = thisObj[methodName];
+
+        thisObj[methodName] = function() {
+            log('log', `[${filename}:${methodName}()]`, arguments);
+
+            return origFunc.apply(thisObj, arguments);
+        }.bind(thisObj);
+    };
+
+    for (let key in thisObj) {
+        if (typeof thisObj[key] === 'function') {
+            wrapMethod(key);
+        }
+    }
+
+    // Autobinding to ensure correct 'this' from all types of function invocations.
+    Object.getOwnPropertyNames(Object.getPrototypeOf(thisObj))
+        .filter(prop => typeof thisObj[prop] === 'function' && prop !== 'constructor')
+        .forEach(method => {
+            thisObj[method] = thisObj[method].bind(thisObj);
+        });
+}
+
+function removeMessengerPortNamePrefix(portName) {
+    return portName.replace(new RegExp('^' + Constants.MESSENGER_PORT_NAME_PREFIX), '');
+}
+
+export default {
+    log,
+    constructorTweakMethods,
+    removeMessengerPortNamePrefix,
+};
